@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>RECEPTURA academy — Профессиональный калькулятор мыла v3.2.0</title>
+<style>
+:root{--teal:#0f766e;--teal-d:#115e59;--teal-l:#14b8a6;--cream:#fdf6ec;--card:#fff;--ink:#1e293b;--mut:#64748b;--ok:#16a34a;--warn:#d97706;--bad:#dc2626;--line:#e2e8f0}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif}
+body{background:var(--cream);color:var(--ink);padding-bottom:40px}
+header{background:linear-gradient(135deg,var(--teal-d),var(--teal-l));color:#fff;padding:calc(env(safe-area-inset-top,0px) + 22px) 16px 18px;text-align:center;border-radius:0 0 22px 22px;box-shadow:0 4px 14px rgba(15,118,110,.35)}
+header h1{font-size:24px;letter-spacing:1px}
+header .sub{font-size:13px;opacity:.9;margin-top:4px}
+.wrap{max-width:760px;margin:0 auto;padding:14px}
+.card{background:var(--card);border-radius:16px;padding:16px;margin-top:14px;box-shadow:0 2px 8px rgba(30,41,59,.08)}
+.card h2{font-size:16px;color:var(--teal-d);margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.step{background:var(--teal);color:#fff;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex:none}
+label{font-size:13px;color:var(--mut);display:block;margin-bottom:4px}
+input[type=number],input[type=text],select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:15px;background:#fff;color:var(--ink)}
+textarea{resize:vertical;min-height:70px;font-family:inherit}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal-l)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row > div{flex:1;min-width:130px}
+.seg{display:flex;border:1.5px solid var(--teal);border-radius:10px;overflow:hidden}
+.seg button{flex:1;padding:9px 4px;border:none;background:#fff;color:var(--teal);font-size:13px;cursor:pointer}
+.seg button.on{background:var(--teal);color:#fff}
+.oil-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+.oil-row .name{flex:1;font-size:14px}
+.oil-row .name small{display:block;color:var(--mut);font-size:11px}
+.oil-row input{width:86px;text-align:right}
+.oil-row .del{background:#fee2e2;color:var(--bad);border:none;width:32px;height:32px;border-radius:8px;font-size:16px;cursor:pointer;flex:none}
+.addbar{display:flex;gap:8px;margin-top:10px}
+.addbar select,.addbar input{flex:1;min-width:0}
+.btn{border:none;border-radius:12px;padding:13px 18px;font-size:15.5px;font-weight:600;cursor:pointer}
+.btn-main{background:var(--teal);color:#fff;width:100%;margin-top:16px;box-shadow:0 4px 10px rgba(15,118,110,.3)}
+.btn-main:active{transform:scale(.98)}
+.btn-ghost{background:#f1f5f9;color:var(--ink)}
+.btn-add{background:var(--teal-l);color:#fff;padding:10px 14px}
+.btn-pdf{background:#b45309;color:#fff}
+.sum-line{margin-top:10px;font-size:14px;color:var(--mut)}
+.sum-line b.ok{color:var(--ok)} .sum-line b.bad{color:var(--bad)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:7px 6px;text-align:left;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.4px}
+td.num,th.num{text-align:right}
+.res-big{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.res-box{background:linear-gradient(135deg,#f0fdfa,#ccfbf1);border:1px solid #99f6e4;border-radius:12px;padding:12px;text-align:center}
+.res-box .v{font-size:20px;font-weight:700;color:var(--teal-d)}
+.res-box .l{font-size:12px;color:var(--mut);margin-top:2px}
+.res-box.lye{background:linear-gradient(135deg,#fff7ed,#ffedd5);border-color:#fdba74}
+.res-box.lye .v{color:#c2410c}
+.qrow{margin-top:10px}
+.qrow .qhead{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:3px}
+.qrow .qhead .val{font-weight:700}
+.bar{position:relative;height:12px;background:#f1f5f9;border-radius:6px;overflow:hidden}
+.bar .range{position:absolute;top:0;bottom:0;background:#d1fae5}
+.bar .fill{position:absolute;top:2px;bottom:2px;width:4px;background:var(--teal-d);border-radius:2px}
+.qnote{font-size:11.5px;color:var(--mut)}
+.badge{font-size:12px;padding:2px 8px;border-radius:99px}
+.badge.ok{background:#dcfce7;color:var(--ok)} .badge.out{background:#fef3c7;color:var(--warn)}
+.hidden{display:none}
+.footer{text-align:center;font-size:12px;color:var(--mut);margin-top:22px}
+.warn-box{background:#fef3c7;border:1px solid #fcd34d;color:#92400e;border-radius:10px;padding:10px 12px;font-size:13px;margin-top:10px}
+.info-box{background:#f0fdfa;border:1px solid #99f6e4;color:var(--teal-d);border-radius:10px;padding:10px 12px;font-size:13px;margin-top:10px}
+.toolbar{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.toolbar .btn{flex:1;min-width:130px}
+.saved-item{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}
+.saved-item .nm{flex:1;font-size:14.5px;font-weight:600}
+.saved-item .dt{font-size:12px;color:var(--mut);font-weight:400}
+.saved-item button{border:none;border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer}
+.saved-item .load{background:#ccfbf1;color:var(--teal-d)}
+.saved-item .rm{background:#fee2e2;color:var(--bad)}
+.savebar{display:flex;gap:8px;margin-top:6px}
+.savebar input{flex:1;min-width:0}
+.mixnote{font-size:12px;color:var(--mut);margin-top:6px}
+.search-wrap{position:relative}
+.search-wrap input{padding-right:32px}
+.search-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--mut);pointer-events:none}
+.inci-box{background:#f8fafc;border:1.5px dashed var(--line);border-radius:10px;padding:10px 12px;font-size:13.5px;line-height:1.55;user-select:all;word-break:break-word}
+.desc-box{background:linear-gradient(135deg,#f0fdfa,#ecfdf5);border:1px solid #99f6e4;border-radius:12px;padding:14px;font-size:14px;line-height:1.65}
+</style>
+</head>
+<body>
+<header>
+  <h1>🧼 RECEPTURA academy</h1>
+  <div class="sub">Профессиональный калькулятор мыловара · Елена Золотухина · химик-технолог</div>
+</header>
+<div class="wrap">
+
+  <!-- 1. Щёлочь -->
+  <div class="card">
+    <h2><span class="step">1</span> Тип щёлочи</h2>
+    <div class="seg" id="lyeSeg">
+      <button class="on" data-v="naoh" onclick="setLye('naoh',this)">NaOH<br>твёрдое</button>
+      <button data-v="koh" onclick="setLye('koh',this)">KOH<br>жидкое</button>
+      <button data-v="mix" onclick="setLye('mix',this)">NaOH + KOH<br>смесь</button>
+    </div>
+    <div id="mixBox" class="hidden" style="margin-top:10px">
+      <div class="row">
+        <div><label>Доля NaOH, %</label><input type="number" id="naohPct" value="60" min="0" max="100" step="5" oninput="syncMix()"></div>
+        <div><label>Доля KOH, %</label><input type="number" id="kohPct" value="40" min="0" max="100" step="5" oninput="syncMixBack()"></div>
+      </div>
+      <div class="mixnote">💡 Классика для крем-мыла и мыла для бритья: 60 % NaOH / 40 % KOH.</div>
+    </div>
+    <div id="kohPurityBox" class="hidden" style="margin-top:10px">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="koh90" checked style="width:auto">Учитывать чистоту KOH 90 % (х.ч./ч.д.а.)</label>
+    </div>
+  </div>
+
+  <!-- 2. Способ мыловарения -->
+  <div class="card">
+    <h2><span class="step">2</span> Способ мыловарения</h2>
+    <div class="seg" id="methodSeg">
+      <button class="on" data-v="cold" onclick="setMethod('cold',this)">❄️ Холодный (CP)</button>
+      <button data-v="hot" onclick="setMethod('hot',this)">🔥 Горячий (HP)</button>
+    </div>
+    <div class="info-box" id="methodNote"></div>
+  </div>
+
+  <!-- 3. Масла: единицы и вес -->
+  <div class="card">
+    <h2><span class="step">3</span> Масла: единицы и общий вес</h2>
+    <div class="row">
+      <div>
+        <label>Режим ввода масел</label>
+        <select id="unitMode" onchange="renderOils()">
+          <option value="percent">Проценты (%)</option>
+          <option value="gram">Граммы (г)</option>
+        </select>
+      </div>
+      <div>
+        <label>Общий вес масел, г</label>
+        <input type="number" id="totalWeight" value="500" min="1" step="10">
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Вода -->
+  <div class="card">
+    <h2><span class="step">4</span> Вода</h2>
+    <div class="row">
+      <div>
+        <label>Способ расчёта</label>
+        <select id="waterMode" onchange="switchWater()">
+          <option value="pct">% от веса масел</option>
+          <option value="conc">Концентрация щёлочного раствора, %</option>
+          <option value="ratio">Соотношение вода : щёлочь</option>
+        </select>
+      </div>
+      <div>
+        <label id="waterLabel">Вода, % от масел</label>
+        <input type="number" id="waterValue" value="38" min="0" step="0.5">
+      </div>
+    </div>
+    <div class="mixnote">💧 Жидкость из пюре (≈80–95 % их веса) автоматически вычитается из воды рецепта.</div>
+  </div>
+
+  <!-- 5. Пережир и отдушка -->
+  <div class="card">
+    <h2><span class="step">5</span> Пережир и отдушка</h2>
+    <div class="row">
+      <div><label>Основной пережир — скидка на щёлочь, %</label><input type="number" id="superfat" value="5" min="0" max="30" step="0.5"></div>
+      <div><label>Отдушка / эф. масла, % от масел</label><input type="number" id="fragrance" value="3" min="0" step="0.1"></div>
+    </div>
+    <div id="hotSfBox" class="info-box hidden" style="margin-top:12px">
+      <b>🔥 Горячий способ: дополнительный пережир после варки</b>
+      <p style="margin-top:5px">Основной пережир выше уменьшает щёлочь. Дополнительные масла вводятся после завершения омыления. Каждый процент ниже считается от массы основных масел, сверх неё. Например, 3 % + 2 % от 1000 г = 30 г + 20 г. Не вычитайте эти масла из основной смеси. Граммы основного пережира — условный эквивалент, а не отдельная навеска.</p>
+      <div class="addbar">
+        <div class="search-wrap" style="flex:1">
+          <input type="text" id="hotSfSearch" placeholder="Поиск масла…" oninput="filterHotSfSelect()">
+          <span class="search-icon">🔍</span>
+        </div>
+        <select id="hotSfSelect" size="1"></select>
+        <button class="btn btn-add" onclick="addHotSfOil()">+</button>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+        <input type="text" id="hotSfCustomName" placeholder="Своё масло…" style="flex:2">
+        <input type="number" id="hotSfCustomPct" placeholder="%" min="0" step="0.1" style="flex:1">
+        <button class="btn btn-add" onclick="addHotSfCustom()">+ Своё</button>
+      </div>
+      <div id="hotSfList"></div>
+      <div class="sum-line" id="hotSfInfo">Дополнительный пережир не добавлен.</div>
+    </div>
+    <div style="margin-top:10px">
+      <label>Название отдушки / эфирного масла</label>
+      <input type="text" id="fragranceName" placeholder="Например: Лаванда 40/42, Дюна, смесь цитрусовых…" list="fragranceHistory">
+      <datalist id="fragranceHistory"></datalist>
+    </div>
+  </div>
+
+  <!-- 6. Кислоты -->
+  <div class="card">
+    <h2><span class="step">6</span> Кислоты <span style="font-weight:400;font-size:12px;color:var(--mut)">— щёлочь на нейтрализацию добавится автоматически</span></h2>
+    <div class="addbar">
+      <div class="search-wrap" style="flex:1">
+        <input type="text" id="acidSearch" placeholder="Поиск…" oninput="filterAcidSelect()">
+        <span class="search-icon">🔍</span>
+      </div>
+      <select id="acidSelect" size="1"></select>
+      <button class="btn btn-add" onclick="addAcid()">+</button>
+    </div>
+    <div id="acidList"></div>
+    <div class="sum-line" id="acidInfo"></div>
+  </div>
+
+  <!-- 7. Добавки -->
+  <div class="card">
+    <h2><span class="step">7</span> Добавки <span style="font-weight:400;font-size:12px;color:var(--mut)">(в базе 48, + своя добавка)</span></h2>
+    <div class="addbar">
+      <div class="search-wrap" style="flex:1">
+        <input type="text" id="addSearch" placeholder="Поиск…" oninput="filterAddSelect()">
+        <span class="search-icon">🔍</span>
+      </div>
+      <select id="addSelect" size="1"></select>
+      <button class="btn btn-add" onclick="addAdditive()">+</button>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px">
+      <input type="text" id="customAddName" placeholder="Своя добавка (название)…" style="flex:2">
+      <input type="number" id="customAddVal" placeholder="%" min="0" step="0.1" style="flex:1">
+      <button class="btn btn-add" onclick="addCustomAdditive()">+ Добавить</button>
+    </div>
+    <div id="addList"></div>
+  </div>
+
+  <!-- 8. Масла -->
+  <div class="card">
+    <h2><span class="step">8</span> Состав масел <span style="font-weight:400;font-size:12px;color:var(--mut)">(в базе 57)</span></h2>
+    <div class="addbar">
+      <div class="search-wrap" style="flex:1">
+        <input type="text" id="oilSearch" placeholder="Поиск…" oninput="filterOilSelect()">
+        <span class="search-icon">🔍</span>
+      </div>
+      <select id="oilSelect" size="1"></select>
+      <button class="btn btn-add" onclick="addOil()">+</button>
+    </div>
+    <div id="oilList"></div>
+    <div class="sum-line" id="sumLine"></div>
+    <div class="warn-box hidden" id="warnBox"></div>
+    <button class="btn btn-main" onclick="calculate()">🧮 Рассчитать рецепт</button>
+    <div class="toolbar">
+      <button class="btn btn-ghost" onclick="resetAll()">Сброс</button>
+    </div>
+  </div>
+
+  <!-- 9. Комментарии к рецепту -->
+  <div class="card">
+    <h2><span class="step">9</span> Название и комментарии к рецепту</h2>
+    <div style="margin-bottom:10px">
+      <label>Название мыла (будет напечатано в заголовке рецепта)</label>
+      <input type="text" id="soapName" placeholder="Например: Лавандовое крем-мыло">
+    </div>
+    <label>Личные заметки (сохранятся вместе с рецептом)</label>
+    <textarea id="recipeComments" placeholder="Например: увеличила пену за счёт кокоса, масса вошла в след быстро, запах держится 3 месяца…"></textarea>
+  </div>
+
+  <!-- Журнал партий -->
+  <div class="card">
+    <h2>📔 Журнал партий</h2>
+    <div class="info-box">Записывайте каждую варку — счётчик созревания покажет, когда мыло готово.</div>
+    <div class="row" style="margin-top:10px">
+      <div><label>Дата варки</label><input type="date" id="batchDate"></div>
+      <div><label>Название партии</label><input type="text" id="batchName" placeholder="напр.: Оливковое-1"></div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <div><label>Тип мыла</label><select id="batchType"><option value="cold">❄️ Холодный (4–6 нед.)</option><option value="hot">🔥 Горячий (1–2 нед.)</option></select></div>
+      <div><label>Дни созревания</label><input type="number" id="batchDays" value="42" min="1" max="90" step="1"></div>
+      <div><button class="btn btn-add" style="width:100%" onclick="addBatch()">➕ Добавить</button></div>
+    </div>
+    <div id="batchList" style="margin-top:10px"></div>
+  </div>
+
+  <!-- Конвертер форм -->
+  <div class="card">
+    <h2>📐 Конвертер размеров форм</h2>
+    <div class="row">
+      <div><label>Форма</label>
+        <select id="moldShape" onchange="moldUI()">
+          <option value="rect">Прямоугольная</option>
+          <option value="cyl">Цилиндр (труба)</option>
+          <option value="vol">Известен объём</option>
+        </select></div>
+      <div><label>Кол-во форм, шт</label><input type="number" id="moldCount" value="1" min="1" step="1" oninput="moldCalcRun()"></div>
+    </div>
+    <div class="row" id="moldRect" style="margin-top:10px">
+      <div><label>Длина, см</label><input type="number" id="mL" value="25" min="0" step="0.1" oninput="moldCalcRun()"></div>
+      <div><label>Ширина, см</label><input type="number" id="mW" value="7" min="0" step="0.1" oninput="moldCalcRun()"></div>
+      <div><label>Высота заливки, см</label><input type="number" id="mH" value="6" min="0" step="0.1" oninput="moldCalcRun()"></div>
+    </div>
+    <div class="row hidden" id="moldCyl" style="margin-top:10px">
+      <div><label>Диаметр, см</label><input type="number" id="mD" value="7" min="0" step="0.1" oninput="moldCalcRun()"></div>
+      <div><label>Высота заливки, см</label><input type="number" id="mHc" value="20" min="0" step="0.1" oninput="moldCalcRun()"></div>
+    </div>
+    <div class="row hidden" id="moldVol" style="margin-top:10px">
+      <div><label>Объём формы, мл</label><input type="number" id="mV" value="1000" min="0" step="10" oninput="moldCalcRun()"></div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <div><label>Коэффициент масел, г/мл</label><input type="number" id="mCoef" value="0.7" min="0.1" max="1" step="0.01" oninput="moldCalcRun()"></div>
+    </div>
+    <div class="info-box" id="moldOut"></div>
+    <button class="btn btn-ghost" style="width:100%;margin-top:10px" onclick="applyMold()">⬇ Подставить в «Общий вес масел»</button>
+    <p class="qnote" style="margin-top:6px">Правило: вес масел ≈ объём формы (мл) × 0,7. Для соляного мыла берите 0,5–0,6.</p>
+  </div>
+
+  <!-- Мои рецепты -->
+  <div class="card">
+    <h2>💾 Мои рецепты</h2>
+    <div class="savebar">
+      <input type="text" id="recipeName" placeholder="Название рецепта…">
+      <button class="btn btn-add" onclick="saveRecipe()">Сохранить</button>
+    </div>
+    <div id="savedList" style="margin-top:8px"></div>
+  </div>
+
+  <!-- Результаты -->
+  <div class="card hidden" id="resultCard">
+    <h2>📋 Рецепт <span id="resTitle" style="font-weight:400;font-size:13px;color:var(--mut)"></span></h2>
+    <div class="res-big" id="resBig"></div>
+    <table id="resTable"></table>
+    <div id="extraTables"></div>
+    <div class="toolbar">
+      <button class="btn btn-pdf" onclick="exportPDF(false)">📄 Скачать PDF</button>
+      <button class="btn btn-pdf" onclick="exportPDF(true)">🖨 Печать PDF</button>
+    </div>
+  </div>
+
+  <div class="card hidden" id="qualCard">
+    <h2>⭐ Свойства мыла</h2>
+    <div id="qualList"></div>
+    <p class="qnote" style="margin-top:10px">Зелёная зона — рекомендуемый диапазон. Расчёт по жирнокислотному составу масел.</p>
+    <div class="info-box" style="margin-top:8px"><b>Что такое INS?</b> INS (Iodine Number Saponification) = число омыления − йодное число. Комплексный показатель «качества» бруска: учитывает и твёрдость, и устойчивость к прогорканию. Идеал ≈ 160: ниже 136 — мыло мягче и быстрее расходуется, выше 165 — может быть слишком твёрдым и хрупким. Йодное число показывает долю ненасыщенных жирных кислот: чем выше, тем мыло мягче и тем быстрее прогоркает.</div>
+  </div>
+
+  <div class="card hidden" id="faCard">
+    <h2>🧪 Жирные кислоты</h2>
+    <table id="faTable"></table>
+  </div>
+
+  <div class="card hidden" id="descCard">
+    <h2>📝 Предполагаемое описание мыла</h2>
+    <div class="desc-box" id="descText"></div>
+    <p class="qnote" style="margin-top:8px">Автоматический прогноз по расчётным свойствам. Реальное мыло зависит также от технологии варки, воды и добавок.</p>
+  </div>
+
+  <div class="card hidden" id="costCard">
+    <h2>💰 Себестоимость партии</h2>
+    <div class="info-box">Введите цены сырья за 1 кг (₽). Цены сохраняются в памяти устройства.</div>
+    <div id="costInputs" style="margin-top:10px"></div>
+    <div class="sum-line" id="costSum" style="margin-top:10px"></div>
+    <div id="costBreakdown" style="margin-top:10px"></div>
+    <button class="btn btn-ghost" style="width:100%;margin-top:10px" onclick="saveCostPrices()">💾 Сохранить цены и пересчитать</button>
+  </div>
+
+  <div class="card hidden" id="inciCard">
+    <h2>🏷 Этикетка состава (INCI)</h2>
+    <div class="seg" id="inciSeg">
+      <button class="on" data-v="raw" onclick="setInciMode('raw',this)">Сырьевой состав</button>
+      <button data-v="sap" onclick="setInciMode('sap',this)">Омылённый состав</button>
+    </div>
+    <label style="margin-top:12px">Состав (рус.) — по ТР ТС 009/2011</label>
+    <div class="inci-box" id="inciRu"></div>
+    <label style="margin-top:10px">Ingredients (INCI)</label>
+    <div class="inci-box" id="inciEn"></div>
+    <div class="toolbar">
+      <button class="btn btn-ghost" onclick="copyTxt('inciRu')">📋 Копировать рус.</button>
+      <button class="btn btn-ghost" onclick="copyTxt('inciEn')">📋 Копировать INCI</button>
+    </div>
+    <p class="qnote" style="margin-top:8px">Ингредиенты — в порядке убывания массы (доли &lt;1 % — в любом порядке). Отдушка указывается как Parfum. В «омылённом» виде щёлочь не указывается — она расходуется в реакции, дополнительно образуется глицерин. Свои добавки выводятся под введённым вами названием — при необходимости уточните их INCI вручную.</p>
+  </div>
+
+  <div class="footer">RECEPTURA academy · v3.2.0 PRO · работает офлайн<br>⚠ Всегда добавляйте щёлочь в воду, а не наоборот! Перчатки и очки обязательны.</div>
+</div>
+<script>
+// ===== БАЗА МАСЕЛ (54): sap = г NaOH / г масла, iod - йодное число, ins - INS
+// ЖК: lau,myr,pal,ste,ric,ole,lin,lnn,eru (%)
+const OILS = [
+ {n:"Абрикосовых косточек масло", sap:0.135, iod:100, ins:91,  lau:0,myr:0,pal:6, ste:1, ric:0, ole:66,lin:27,lnn:0,eru:0},
+ {n:"Авокадо масло",              sap:0.133, iod:86,  ins:99,  lau:0,myr:0,pal:20,ste:2, ric:0, ole:58,lin:12,lnn:1,eru:0},
+ {n:"Аргановое масло",            sap:0.136, iod:95,  ins:95,  lau:0,myr:0,pal:14,ste:6, ric:0, ole:46,lin:34,lnn:0,eru:0},
+ {n:"Бабассу масло",              sap:0.175, iod:15,  ins:230, lau:50,myr:20,pal:11,ste:4,ric:0, ole:10,lin:0, lnn:0,eru:0},
+ {n:"Баобаба масло",              sap:0.1385,iod:75,  ins:119, lau:0,myr:0,pal:24,ste:4, ric:0, ole:37,lin:29,lnn:2,eru:0},
+ {n:"Бораго (огуречника) масло",  sap:0.1357,iod:135, ins:50,  lau:0,myr:0,pal:10,ste:4, ric:0, ole:18,lin:39,lnn:5,eru:0},
+ {n:"Виноградной косточки масло", sap:0.1265,iod:131, ins:66,  lau:0,myr:0,pal:8, ste:4, ric:0, ole:20,lin:68,lnn:0,eru:0},
+ {n:"Вишнёвых косточек масло",    sap:0.135, iod:118, ins:73,  lau:0,myr:0,pal:8, ste:2, ric:0, ole:44,lin:42,lnn:3,eru:0},
+ {n:"Горчичное масло",            sap:0.1241,iod:102, ins:71,  lau:0,myr:0,pal:3, ste:1, ric:0, ole:22,lin:15,lnn:12,eru:45},
+ {n:"Грецкого ореха масло",       sap:0.135, iod:145, ins:45,  lau:0,myr:0,pal:7, ste:2, ric:0, ole:18,lin:60,lnn:12,eru:0},
+ {n:"Гхи (масло гхи)",            sap:0.162, iod:33,  ins:191, lau:3,myr:11,pal:28,ste:12,ric:0, ole:26,lin:3, lnn:1,eru:0},
+ {n:"Жожоба (воск)",              sap:0.069, iod:83,  ins:11,  lau:0,myr:0,pal:1, ste:0, ric:0, ole:12,lin:0, lnn:0,eru:0},
+ {n:"Зародышей пшеницы масло",    sap:0.131, iod:128, ins:58,  lau:0,myr:0,pal:17,ste:2, ric:0, ole:17,lin:55,lnn:7,eru:0},
+ {n:"Какао масло (нерафинированное)",sap:0.138,iod:37, ins:157, lau:0,myr:0,pal:28,ste:33,ric:0, ole:35,lin:3, lnn:0,eru:0},
+ {n:"Какао масло (рафинированное)",  sap:0.138,iod:36, ins:158, lau:0,myr:0,pal:27,ste:34,ric:0, ole:35,lin:3, lnn:0,eru:0},
+ {n:"Касторовое масло",           sap:0.1286,iod:86,  ins:95,  lau:0,myr:0,pal:0, ste:0, ric:90,ole:4, lin:4, lnn:0,eru:0},
+ {n:"Кокосовое масло",            sap:0.183, iod:10,  ins:258, lau:48,myr:19,pal:9,ste:3, ric:0, ole:8, lin:2, lnn:0,eru:0},
+ {n:"Конопляное масло",           sap:0.1345,iod:165, ins:39,  lau:0,myr:0,pal:6, ste:2, ric:0, ole:12,lin:57,lnn:21,eru:0},
+ {n:"Кофе (зелёных зёрен) масло", sap:0.128, iod:85,  ins:98,  lau:0,myr:0,pal:38,ste:8, ric:0, ole:9, lin:39,lnn:2,eru:0},
+ {n:"Кукурузное масло",           sap:0.136, iod:117, ins:69,  lau:0,myr:0,pal:12,ste:2, ric:0, ole:32,lin:51,lnn:1,eru:0},
+ {n:"Кунжутное масло",            sap:0.133, iod:110, ins:81,  lau:0,myr:0,pal:9, ste:5, ric:0, ole:40,lin:43,lnn:0,eru:0},
+ {n:"Купуасу масло (баттер)",     sap:0.1364,iod:42,  ins:145, lau:0,myr:0,pal:8, ste:35,ric:0, ole:42,lin:4, lnn:0,eru:0},
+ {n:"Ланолин безводный",          sap:0.074, iod:27,  ins:83,  lau:0,myr:2,pal:6, ste:2, ric:0, ole:22,lin:0, lnn:0,eru:0},
+ {n:"Лесного ореха (фундук)",     sap:0.1356,iod:97,  ins:94,  lau:0,myr:0,pal:5, ste:3, ric:0, ole:75,lin:10,lnn:0,eru:0},
+ {n:"Льняное масло",              sap:0.1357,iod:180, ins:6,   lau:0,myr:0,pal:5, ste:4, ric:0, ole:20,lin:16,lnn:55,eru:0},
+ {n:"Макадамии масло",            sap:0.139, iod:76,  ins:119, lau:0,myr:1,pal:9, ste:5, ric:0, ole:59,lin:2, lnn:0,eru:0},
+ {n:"Манго масло (баттер)",       sap:0.1371,iod:45,  ins:146, lau:0,myr:0,pal:7, ste:42,ric:0, ole:45,lin:3, lnn:0,eru:0},
+ {n:"Миндальное масло (сладкий)", sap:0.136, iod:99,  ins:97,  lau:0,myr:0,pal:7, ste:2, ric:0, ole:71,lin:18,lnn:0,eru:0},
+ {n:"Моной де Таити",             sap:0.183, iod:10,  ins:258, lau:48,myr:19,pal:9,ste:3, ric:0, ole:8, lin:2, lnn:0,eru:0},
+ {n:"Ним (нима) масло",           sap:0.1387,iod:72,  ins:124, lau:0,myr:2,pal:18,ste:15,ric:0, ole:45,lin:12,lnn:0,eru:0},
+ {n:"Облепиховое масло (мякоть)", sap:0.1387,iod:78,  ins:120, lau:0,myr:1,pal:33,ste:1, ric:0, ole:26,lin:7, lnn:2,eru:0},
+ {n:"Оливковое масло (нерафинированное, высший сорт)",sap:0.135,iod:85,ins:105,lau:0,myr:0,pal:14,ste:3,ric:0,ole:69,lin:12,lnn:1,eru:0},
+ {n:"Оливковое масло (помас, жмыховое)",sap:0.135,iod:88,ins:102,lau:0,myr:0,pal:15,ste:3,ric:0,ole:68,lin:11,lnn:1,eru:0},
+ {n:"Оливковое масло (рафинированное)",sap:0.135,iod:83,ins:108,lau:0,myr:0,pal:13,ste:3,ric:0,ole:71,lin:10,lnn:1,eru:0},
+ {n:"Пальмовое масло",            sap:0.142, iod:53,  ins:145, lau:0,myr:1,pal:44,ste:5, ric:0, ole:39,lin:10,lnn:0,eru:0},
+ {n:"Пальмоядровое масло",        sap:0.156, iod:20,  ins:227, lau:49,myr:16,pal:8,ste:2, ric:0, ole:15,lin:3, lnn:0,eru:0},
+ {n:"Персиковых косточек масло",  sap:0.1335,iod:108, ins:83,  lau:0,myr:0,pal:6, ste:2, ric:0, ole:61,lin:29,lnn:0,eru:0},
+ {n:"Подсолнечное высокоолеиновое",sap:0.135,iod:83, ins:106, lau:0,myr:0,pal:4, ste:4, ric:0, ole:83,lin:4, lnn:0,eru:0},
+ {n:"Подсолнечное масло",         sap:0.135, iod:133, ins:63,  lau:0,myr:0,pal:7, ste:4, ric:0, ole:16,lin:70,lnn:1,eru:0},
+ {n:"Пчелиный воск",              sap:0.069, iod:10,  ins:84,  lau:0,myr:0,pal:0, ste:0, ric:0, ole:0, lin:0, lnn:0,eru:0},
+ {n:"Рапсовое масло",             sap:0.133, iod:110, ins:56,  lau:0,myr:0,pal:4, ste:2, ric:0, ole:61,lin:21,lnn:9,eru:0},
+ {n:"Рисовых отрубей масло",      sap:0.128, iod:100, ins:87,  lau:0,myr:1,pal:18,ste:3, ric:0, ole:40,lin:35,lnn:1,eru:0},
+ {n:"Сало баранье (топлёное)",    sap:0.1383,iod:54,  ins:156, lau:0,myr:4,pal:25,ste:25,ric:0, ole:36,lin:5, lnn:0,eru:0},
+ {n:"Сало говяжье (топлёное)",    sap:0.1405,iod:45,  ins:147, lau:0,myr:3,pal:28,ste:22,ric:0, ole:36,lin:3, lnn:1,eru:0},
+ {n:"Смалец (свиной жир)",        sap:0.138, iod:57,  ins:139, lau:0,myr:1,pal:28,ste:13,ric:0, ole:46,lin:6, lnn:0,eru:0},
+ {n:"Соевое масло",               sap:0.135, iod:131, ins:61,  lau:0,myr:0,pal:11,ste:5, ric:0, ole:24,lin:50,lnn:8,eru:0},
+ {n:"Стеариновая кислота",        sap:0.141, iod:2,   ins:196, lau:0,myr:0,pal:0, ste:98,ric:0, ole:0, lin:0, lnn:0,eru:0},
+ {n:"Топлёное масло (сливочное)", sap:0.160, iod:32,  ins:190, lau:3,myr:11,pal:29,ste:12,ric:0, ole:25,lin:3, lnn:1,eru:0},
+ {n:"Тыквенных семечек масло",    sap:0.133, iod:128, ins:67,  lau:0,myr:0,pal:12,ste:5, ric:0, ole:32,lin:49,lnn:1,eru:0},
+ {n:"Фруктоза (для прозрачности)",sap:0,     iod:0,   ins:0,   lau:0,myr:0,pal:0, ste:0, ric:0, ole:0, lin:0, lnn:0,eru:0},
+ {n:"Хлопковое масло",            sap:0.1386,iod:108, ins:89,  lau:0,myr:1,pal:23,ste:2, ric:0, ole:18,lin:52,lnn:0,eru:0},
+ {n:"Чёрного тмина масло",        sap:0.1385,iod:133, ins:62,  lau:0,myr:0,pal:12,ste:3, ric:0, ole:24,lin:56,lnn:0,eru:0},
+ {n:"Ши (карите) масло (нерафинированное)",sap:0.128,iod:59,ins:116,lau:0,myr:0,pal:5,ste:40,ric:0,ole:48,lin:6,lnn:0,eru:0},
+ {n:"Ши (карите) масло (рафинированное)",  sap:0.128,iod:58,ins:117,lau:0,myr:0,pal:5,ste:41,ric:0,ole:47,lin:6,lnn:0,eru:0},
+ {n:"Шиповника семян масло",      sap:0.1378,iod:185, ins:16,  lau:0,myr:0,pal:4, ste:2, ric:0, ole:14,lin:44,lnn:32,eru:0},
+ {n:"Энотеры (примулы) масло",    sap:0.1357,iod:160, ins:30,  lau:0,myr:0,pal:6, ste:2, ric:0, ole:9, lin:72,lnn:0,eru:0},
+ {n:"Яичного желтка масло",       sap:0.1395,iod:70,  ins:129, lau:0,myr:0,pal:23,ste:8, ric:0, ole:44,lin:16,lnn:0,eru:0}
+];
+
+// ===== КИСЛОТЫ: naoh = г NaOH на 1 г кислоты (нейтрализация), dose = рекомендация % от масел
+const ACIDS = [
+ {n:"Молочная кислота 80 %",        naoh:0.356, dose:"2–3 %", note:"лактат натрия ускоряет затвердевание"},
+ {n:"Лимонная кислота (безводная)", naoh:0.624, dose:"1–2 %", note:"цитрат натрия — хелатор, против налёта"},
+ {n:"Лимонная кислота (моногидрат)",naoh:0.571, dose:"1–2 %", note:"пересчёт на моногидрат"},
+ {n:"Янтарная кислота",             naoh:0.677, dose:"0,5–1,5 %", note:"сукцинат натрия"},
+ {n:"Фитиновая кислота (50 % р-р)", naoh:0.364, dose:"0,5–1 %",   note:"мощный хелатор"},
+ {n:"Яблочная кислота",             naoh:0.597, dose:"0,5–1,5 %", note:"малат натрия"},
+ {n:"Глюконолактон (GDL)",          naoh:0.225, dose:"1–3 %", note:"глюконат натрия — мягкий хелатор"},
+ {n:"Глицин (аминоуксусная кислота)",naoh:0.533,dose:"0,5–2 %",note:"для мягких детских рецептов"}
+];
+
+// ===== ДОБАВКИ: dose = рекомендация % от масел, stage = этап ввода, water = доля веса, вычитаемая из воды
+const ADDITIVES = [
+ {n:"Глина белая (каолин)",     dose:"1–2 %", stage:"в след, развести в воде", water:0},
+ {n:"Глина розовая",            dose:"1–2 %", stage:"в след", water:0},
+ {n:"Глина зелёная",            dose:"1–2 %", stage:"в след", water:0},
+ {n:"Глина голубая (кембрийская)",dose:"1–2 %",stage:"в след", water:0},
+ {n:"Глина красная",            dose:"1–2 %", stage:"в след", water:0},
+ {n:"Глина чёрная (вулканическая)",dose:"1–2 %",stage:"в след", water:0},
+ {n:"Глина жёлтая",             dose:"1–2 %", stage:"в след", water:0},
+ {n:"Грязь Мёртвого моря",       dose:"1–5 %", stage:"в след, развести в воде", water:0.15},
+ {n:"Грязь чёрная (сульфидная, иловая)",dose:"1–5 %",stage:"в след, развести в воде", water:0.15},
+ {n:"Грязь сакская (Крым)",       dose:"1–5 %", stage:"в след, развести в воде", water:0.15},
+ {n:"Грязь тамбуканская",         dose:"1–5 %", stage:"в след, развести в воде", water:0.15},
+ {n:"Грязь вулканическая (пепел)",dose:"1–3 %", stage:"в след, развести в воде", water:0},
+ {n:"Грязь торфяная (пелоид)",    dose:"1–5 %", stage:"в след, развести в воде", water:0.15},
+ {n:"Рапа/бишофит (солевой концентрат)",dose:"1–3 %",stage:"в воду до щёлочи", water:0.5},
+ {n:"Глицин",                   dose:"0,5–1 %", stage:"в воду до щёлочи", water:0},
+ {n:"Сорбитол 70 % (жидкий)",   dose:"2–5 %", stage:"в воду, для прозрачности", water:0.3},
+ {n:"Сорбит сухой",             dose:"1,5–3,5 %", stage:"в горячую воду", water:0},
+ {n:"Ментол (кристаллы)",       dose:"0,5–2 %", stage:"растворить в пережире/масле", water:0},
+ {n:"Молотая овсянка",          dose:"1–3 %", stage:"в след, скраб-эффект", water:0},
+ {n:"Травы сушёные (календула, ромашка…)",dose:"0,5–1,5 %", stage:"в след", water:0},
+ {n:"Куркума (краситель)",      dose:"0,2–1 %", stage:"в след, жёлто-оранжевый", water:0},
+ {n:"Паприка (краситель)",      dose:"0,2–1 %", stage:"в масла, персиковый", water:0},
+ {n:"Корица молотая",           dose:"0,2–1 %", stage:"в след, может греть кожу", water:0},
+ {n:"Какао-порошок (краситель)",dose:"0,5–1,5 %", stage:"в след, коричневый", water:0},
+ {n:"Уголь бамбуковый",         dose:"0,5–1,5 %", stage:"в след, чёрный", water:0},
+ {n:"Уголь активированный",     dose:"0,5–1,5 %", stage:"в след, чёрный/серый", water:0},
+ {n:"Горчичный порошок",        dose:"0,5–1,5 %", stage:"в след, разогревающий", water:0},
+ {n:"Дёготь берёзовый",          dose:"2–10 %", stage:"в след, ускоряет след, тёмный цвет", water:0},
+ {n:"Пюре овощное (тыква, морковь…)",dose:"5–15 %", stage:"в след/в масла", water:0.8},
+ {n:"Пюре фруктовое (банан, яблоко…)",dose:"5–15 %",stage:"в след", water:0.8},
+ {n:"Пюре огурца",              dose:"5–15 %", stage:"в след/в масла", water:0.95},
+ {n:"Пюре авокадо",             dose:"5–15 %", stage:"в след/в масла", water:0.75},
+ {n:"Сера (медицинская)",       dose:"1–3 %", stage:"в след, для проблемной кожи", water:0},
+ {n:"Сода пищевая",             dose:"0,5–2 %", stage:"в след, мягкий скраб", water:0},
+ {n:"Фруктоза",                 dose:"1–3 %", stage:"в воду, пена и прозрачность", water:0},
+ {n:"Мёд",                      dose:"1–3 %", stage:"в след, греет массу", water:0.2},
+ {n:"Молоко сухое",             dose:"1–3 %", stage:"в след, развести в масле", water:0},
+ {n:"Шёлк (волокна/пептиды)",   dose:"0,1–0,3 %", stage:"в горячий щелочной р-р", water:0},
+ {n:"Соль морская",             dose:"до 5–100 % (соляное)", stage:"в след", water:0},
+ {n:"Сахар",                    dose:"1–3 %", stage:"в воду, усиливает пену", water:0},
+ {n:"Диоксид титана",           dose:"0,3–1 %", stage:"в след, отбеливатель", water:0},
+ {n:"Оксиды-пигменты (мика и др.)",dose:"0,2–1 %",stage:"в след", water:0},
+ {n:"Кофе молотый",             dose:"1–3 %", stage:"в след, скраб", water:0},
+ {n:"Мак (семена)",             dose:"0,5–1,5 %", stage:"в след, скраб", water:0},
+ {n:"Люфа молотая",             dose:"1–3 %", stage:"в след, скраб", water:0},
+ {n:"Лактат натрия 60 % (раствор)",dose:"2–4 %", stage:"в след, ускоряет затвердевание", water:0.4},
+ {n:"Цитрат натрия (порошок)",  dose:"0,5–1,5 %", stage:"в воду до щёлочи, хелатор", water:0},
+ {n:"Цедра цитрусовых (молотая)",dose:"0,5–2 %", stage:"в след", water:0}
+];
+
+const QUALITIES = [
+ {key:"hard", name:"Твёрдость",         lo:29, hi:54, max:100},
+ {key:"clean",name:"Очищение",          lo:12, hi:22, max:100},
+ {key:"cond", name:"Кондиционирование", lo:44, hi:69, max:100},
+ {key:"bub",  name:"Пена пышная",       lo:14, hi:46, max:100},
+ {key:"cre",  name:"Пена кремовая",     lo:16, hi:48, max:100},
+ {key:"iod",  name:"Йодное число",      lo:41, hi:70, max:200},
+ {key:"ins",  name:"INS",               lo:136,hi:165,max:300}
+];
+
+const FA_NAMES = [["lau","Лауриновая"],["myr","Миристиновая"],["pal","Пальмитиновая"],["ste","Стеариновая"],["ric","Рицинолевая"],["ole","Олеиновая"],["lin","Линолевая"],["lnn","Линоленовая"],["eru","Эруковая"]];
+
+const KOH_FACTOR = 56.1/40.0;
+const STORE_KEY = "receptura_recipes_v31";
+</script>
+<script>
+// ===== БЕЗОПАСНОЕ ХРАНИЛИЩЕ (в iframe сторонний localStorage может быть заблокирован) =====
+const MEM={};
+const LS={
+  get(k){ try{ return window.localStorage.getItem(k); }catch(e){ return (k in MEM)?MEM[k]:null; } },
+  set(k,v){ try{ window.localStorage.setItem(k,v); }catch(e){ MEM[k]=v; } },
+  del(k){ try{ window.localStorage.removeItem(k); }catch(e){ delete MEM[k]; } },
+  ok(){ try{ window.localStorage.setItem("__t","1"); window.localStorage.removeItem("__t"); return true; }catch(e){ return false; } }
+};
+
+let lyeType="naoh", method="cold";
+let recipe=[], acids=[], adds=[], customAdds=[];
+let hotSf=[], hotSfCustom=[], hotSfTotalGrams=0;
+let lastCalc=null;
+let fragranceHistory = []; // история названий отдушек
+
+function $(id){return document.getElementById(id)}
+function fmt(x,d){d=(d===undefined)?1:d;return x.toFixed(d).replace(".",",")}
+
+// ===== Управление щёлочью и способом =====
+function setLye(v,btn){
+  lyeType=v;
+  document.querySelectorAll("#lyeSeg button").forEach(b=>b.classList.remove("on"));
+  if(btn) btn.classList.add("on");
+  else document.querySelector('#lyeSeg button[data-v="'+v+'"]').classList.add("on");
+  $("kohPurityBox").classList.toggle("hidden", v==="naoh");
+  $("mixBox").classList.toggle("hidden", v!=="mix");
+}
+function setMethod(v,btn){
+  method=v;
+  document.querySelectorAll("#methodSeg button").forEach(b=>b.classList.remove("on"));
+  if(btn) btn.classList.add("on");
+  else document.querySelector('#methodSeg button[data-v="'+v+'"]').classList.add("on");
+  $("hotSfBox").classList.toggle("hidden",v!=="hot");
+  methodNoteText();
+}
+function methodNoteText(){
+  $("methodNote").innerHTML = method==="cold"
+   ? "❄️ <b>Холодный способ (CP):</b> созревание 4–6 недель. Кислоты растворяйте в воде ДО добавления щёлочи. Добавки — на стадии следа."
+   : "🔥 <b>Горячий способ (HP):</b> готово после варки 2–4 ч, созревание 1–2 недели. Рекомендуем +10 % воды на выпаривание (учтено в расчёте). Кислоты с компенсацией щёлочи вводите в водную фазу до щёлочи; дополнительный пережир — после завершения омыления. Сам гель не подтверждает завершение реакции.";
+}
+function syncMix(){let n=Math.min(100,Math.max(0,parseFloat($("naohPct").value)||0));$("naohPct").value=n;$("kohPct").value=+(100-n).toFixed(1)}
+function syncMixBack(){let k=Math.min(100,Math.max(0,parseFloat($("kohPct").value)||0));$("kohPct").value=k;$("naohPct").value=+(100-k).toFixed(1)}
+
+// ===== Поиск по первым буквам =====
+function filterOilSelect(){
+  const q=$("oilSearch").value.toLowerCase().trim();
+  const sel=$("oilSelect");
+  if(!q){sel.innerHTML=OILS.map((o,i)=>'<option value="'+i+'">'+o.n+'</option>').join("");return}
+  const f=OILS.map((o,i)=>({i,n:o.n})).filter(o=>o.n.toLowerCase().indexOf(q)>=0);
+  sel.innerHTML=f.length?f.map(o=>'<option value="'+o.i+'">'+o.n+'</option>').join(""):'<option disabled>Не найдено</option>';
+}
+function filterAcidSelect(){
+  const q=$("acidSearch").value.toLowerCase().trim();
+  const sel=$("acidSelect");
+  if(!q){sel.innerHTML=ACIDS.map((a,i)=>'<option value="'+i+'">'+a.n+'</option>').join("");return}
+  const f=ACIDS.map((a,i)=>({i,n:a.n})).filter(a=>a.n.toLowerCase().indexOf(q)>=0);
+  sel.innerHTML=f.length?f.map(a=>'<option value="'+a.i+'">'+a.n+'</option>').join(""):'<option disabled>Не найдено</option>';
+}
+function filterAddSelect(){
+ const q=$("addSearch").value.toLowerCase().trim();
+ $("addSelect").innerHTML=ADDITIVES.map((a,i)=>({a,i})).filter(v=>v.a.n.toLowerCase().includes(q)).map(v=>'<option value="'+v.i+'">'+v.a.n+'</option>').join('')||'<option disabled>Не найдено</option>';
+}
+function filterHotSfSelect(){
+  const q=$("hotSfSearch").value.toLowerCase().trim(), sel=$("hotSfSelect");
+  const f=OILS.map((o,i)=>({i,n:o.n})).filter(o=>!q||o.n.toLowerCase().includes(q));
+  sel.innerHTML=f.length?f.map(o=>'<option value="'+o.i+'">'+o.n+'</option>').join(""):'<option disabled>Не найдено</option>';
+}
+function updateHotSfInfo(){
+  hotSfTotalGrams=totalForHotSf()*(hotSf.reduce((s,o)=>s+o.pct,0)+hotSfCustom.reduce((s,o)=>s+o.pct,0))/100;
+  const sum=hotSf.reduce((s,o)=>s+o.pct,0)+hotSfCustom.reduce((s,o)=>s+o.pct,0);
+  $("hotSfInfo").innerHTML=sum>0?'Дополнительный пережир: <b class="'+(sum<=30?'ok':'bad')+'">'+fmt(sum,1)+' % = '+fmt(hotSfTotalGrams,1)+' г</b>'+(sum>30?' (проверьте дозировку)':''):'Дополнительный пережир не добавлен.';
+}
+function renderHotSf(){
+  let h=hotSf.map((o,i)=>'<div class="oil-row"><span class="name">'+OILS[o.idx].n+'<small>дополнительный пережир</small></span><input type="number" min="0" step="0.1" value="'+o.pct+'" oninput="hotSf['+i+'].pct=parseFloat(this.value)||0;updateHotSf()"><span style="font-size:13px;color:var(--mut);width:14px">%</span><button class="del" onclick="hotSf.splice('+i+',1);renderHotSf();updateHotSf()">✕</button></div>').join("");
+  h+=hotSfCustom.map((o,i)=>'<div class="oil-row"><span class="name">'+o.name+'<small>своё масло, дополнительный пережир</small></span><input type="number" min="0" step="0.1" value="'+o.pct+'" oninput="hotSfCustom['+i+'].pct=parseFloat(this.value)||0;updateHotSf()"><span style="font-size:13px;color:var(--mut);width:14px">%</span><button class="del" onclick="hotSfCustom.splice('+i+',1);renderHotSf();updateHotSf()">✕</button></div>').join("");
+  $("hotSfList").innerHTML=h; updateHotSfInfo();
+}
+function updateHotSf(){
+  hotSfTotalGrams=totalForHotSf()*((hotSf.reduce((s,o)=>s+o.pct,0)+hotSfCustom.reduce((s,o)=>s+o.pct,0))/100); updateHotSfInfo();
+}
+function addHotSfOil(){
+  const idx=parseInt($("hotSfSelect").value); if(isNaN(idx))return;
+  if(hotSf.some(o=>o.idx===idx)){alert("Это масло уже добавлено");return}
+  hotSf.push({idx,pct:0}); renderHotSf();
+}
+function addHotSfCustom(){
+  const name=$("hotSfCustomName").value.trim(), pct=parseFloat($("hotSfCustomPct").value)||0;
+  if(!name||pct<=0){alert("Укажите название и процент собственного масла");return}
+  hotSfCustom.push({name,pct}); $("hotSfCustomName").value="";$("hotSfCustomPct").value="";renderHotSf();
+}
+function totalForHotSf(){
+  if($("unitMode").value==="gram")return recipe.reduce((s,r)=>s+r.val,0);
+  return parseFloat($("totalWeight").value)||0;
+}
+
+function fillSelects(){
+  filterOilSelect();
+  filterAcidSelect();
+  filterAddSelect();
+  filterHotSfSelect();
+  loadFragranceHistory();
+}
+function switchWater(){
+  const m=$("waterMode").value, lbl=$("waterLabel"), inp=$("waterValue");
+  if(m==="pct"){lbl.textContent="Вода, % от масел";inp.value=38}
+  if(m==="conc"){lbl.textContent="Концентрация раствора, %";inp.value=33}
+  if(m==="ratio"){lbl.textContent="Вода : щёлочь (напр. 2 = 2:1)";inp.value=2}
+}
+
+// ===== Масла =====
+function addOil(){
+  const idx=parseInt($("oilSelect").value);
+  if(isNaN(idx)){alert("Выберите масло из списка");return}
+  if(recipe.some(r=>r.idx===idx)){alert("Это масло уже добавлено");return}
+  recipe.push({idx,val:0}); renderOils();
+}
+function delOil(i){recipe.splice(i,1);renderOils()}
+function renderOils(){
+  const unit=$("unitMode").value==="percent"?"%":"г";
+  $("oilList").innerHTML=recipe.map((r,i)=>
+    '<div class="oil-row"><span class="name">'+OILS[r.idx].n+'</span>'+
+    '<input type="number" min="0" step="0.5" value="'+(r.val||"")+'" placeholder="0" oninput="recipe['+i+'].val=parseFloat(this.value)||0;updateSum()">'+
+    '<span style="font-size:13px;color:var(--mut);width:14px">'+unit+'</span>'+
+    '<button class="del" onclick="delOil('+i+')">✕</button></div>').join("");
+  updateSum();
+}
+function updateSum(){
+  const mode=$("unitMode").value, sum=recipe.reduce((a,r)=>a+r.val,0), el=$("sumLine");
+  if(!recipe.length){el.innerHTML="Добавьте хотя бы одно масло.";return}
+  if(mode==="percent"){
+    const ok=Math.abs(sum-100)<0.01;
+    el.innerHTML='Сумма: <b class="'+(ok?'ok':'bad')+'">'+sum.toFixed(1)+' %</b> '+(ok?"✓":"(должно быть 100 %)");
+  } else el.innerHTML='Общий вес масел: <b class="ok">'+sum.toFixed(0)+' г</b>';
+}
+
+// ===== Кислоты =====
+function addAcid(){
+  const idx=parseInt($("acidSelect").value);
+  if(isNaN(idx)){alert("Выберите кислоту из списка");return}
+  if(acids.some(a=>a.idx===idx)){alert("Эта кислота уже добавлена");return}
+  acids.push({idx,val:0}); renderAcids();
+}
+function delAcid(i){acids.splice(i,1);renderAcids()}
+function renderAcids(){
+  $("acidList").innerHTML=acids.map((a,i)=>
+    '<div class="oil-row"><span class="name">'+ACIDS[a.idx].n+'<small>'+ACIDS[a.idx].dose+' · '+ACIDS[a.idx].note+'</small></span>'+
+    '<input type="number" min="0" step="0.1" value="'+(a.val||"")+'" placeholder="%" oninput="acids['+i+'].val=parseFloat(this.value)||0;acidInfoLine()">'+
+    '<span style="font-size:13px;color:var(--mut);width:14px">%</span>'+
+    '<button class="del" onclick="delAcid('+i+')">✕</button></div>').join("");
+  acidInfoLine();
+}
+function acidInfoLine(){
+  if(!acids.length){$("acidInfo").innerHTML="Кислоты не добавлены (по желанию).";return}
+  $("acidInfo").innerHTML="Кислоты добавлены. Доп. щёлочь на нейтрализацию рассчитается автоматически при расчёте рецепта.";
+}
+
+// ===== Добавки =====
+function addAdditive(){
+  const idx=parseInt($("addSelect").value);
+  if(isNaN(idx)){alert("Выберите добавку из списка");return}
+  if(adds.some(a=>a.idx===idx)){alert("Эта добавка уже в списке");return}
+  adds.push({idx,val:0}); renderAdds();
+}
+function addCustomAdditive(){
+  const name=$("customAddName").value.trim();
+  const val=parseFloat($("customAddVal").value)||0;
+  if(!name){alert("Введите название добавки");return}
+  if(val<=0){alert("Укажите количество в %");return}
+  customAdds.push({name,val});
+  $("customAddName").value=""; $("customAddVal").value="";
+  renderAdds();
+}
+function delAdd(i){adds.splice(i,1);renderAdds()}
+function delCustomAdd(i){customAdds.splice(i,1);renderAdds()}
+function renderAdds(){
+  let html=adds.map((a,i)=>
+    '<div class="oil-row"><span class="name">'+ADDITIVES[a.idx].n+'<small>'+ADDITIVES[a.idx].dose+' · '+ADDITIVES[a.idx].stage+'</small></span>'+
+    '<input type="number" min="0" step="0.1" value="'+(a.val||"")+'" placeholder="%" oninput="adds['+i+'].val=parseFloat(this.value)||0">'+
+    '<span style="font-size:13px;color:var(--mut);width:14px">%</span>'+
+    '<button class="del" onclick="delAdd('+i+')">✕</button></div>').join("");
+  html+=customAdds.map((a,i)=>
+    '<div class="oil-row"><span class="name">'+a.name+' <small>(своя добавка)</small></span>'+
+    '<input type="number" min="0" step="0.1" value="'+a.val+'" placeholder="%" oninput="customAdds['+i+'].val=parseFloat(this.value)||0">'+
+    '<span style="font-size:13px;color:var(--mut);width:14px">%</span>'+
+    '<button class="del" onclick="delCustomAdd('+i+')">✕</button></div>').join("");
+  $("addList").innerHTML=html;
+}
+
+function showWarn(m){const w=$("warnBox");w.textContent="⚠ "+m;w.classList.remove("hidden")}
+
+// ===== Отдушки =====
+function saveFragranceName(){
+  const name=$("fragranceName").value.trim();
+  if(name&&!fragranceHistory.includes(name)){
+    fragranceHistory.push(name);
+    if(fragranceHistory.length>20) fragranceHistory.shift();
+    LS.set("receptura_fragrances",JSON.stringify(fragranceHistory));
+    loadFragranceHistory();
+  }
+}
+function loadFragranceHistory(){
+  try{fragranceHistory=JSON.parse(LS.get("receptura_fragrances"))||[]}catch(e){fragranceHistory=[]}
+  const dl=$("fragranceHistory");
+  dl.innerHTML=fragranceHistory.map(n=>'<option value="'+n+'">').join("");
+}
+
+// ===== РАСЧЁТ =====
+function calculate(){
+  lastCalc=null;
+  ["resultCard","qualCard","faCard","descCard","costCard","inciCard"].forEach(id=>$(id).classList.add("hidden"));
+  if([...recipe,...acids,...adds,...customAdds].some(o=>!Number.isFinite(o.val)||o.val<0)|| !Number.isFinite(Number($("superfat").value)) || Number($("superfat").value)<0 || Number($("superfat").value)>30 || (method==="hot"&&[...hotSf,...hotSfCustom].some(o=>!Number.isFinite(o.pct)||o.pct<0))){showWarn("Проверьте числа: отрицательные значения недопустимы, основной пережир — 0–30 %.");return;}
+  $("warnBox").classList.add("hidden");
+  if(!recipe.length){showWarn("Добавьте хотя бы одно масло.");return}
+  const mode=$("unitMode").value;
+  let grams=[], total=0;
+  if(mode==="percent"){
+    const sum=recipe.reduce((a,r)=>a+r.val,0);
+    if(Math.abs(sum-100)>0.01){showWarn("Сумма процентов = "+fmt(sum)+" %. Приведите к 100 %.");return}
+    total=parseFloat($("totalWeight").value)||0;
+    if(total<=0){showWarn("Укажите общий вес масел.");return}
+    grams=recipe.map(r=>total*r.val/100);
+  } else {
+    grams=recipe.map(r=>r.val);
+    total=grams.reduce((a,b)=>a+b,0);
+    if(total<=0){showWarn("Укажите вес масел в граммах.");return}
+  }
+  const sf=(parseFloat($("superfat").value)||0)/100;
+  const hotSfG=method==="hot"?hotSf.map(o=>({n:OILS[o.idx].n,pct:o.pct,g:total*o.pct/100})):[];
+  const hotSfCustomG=method==="hot"?hotSfCustom.map(o=>({n:o.name,pct:o.pct,g:total*o.pct/100})):[];
+  const hotSfGrams=hotSfG.reduce((s,o)=>s+o.g,0)+hotSfCustomG.reduce((s,o)=>s+o.g,0);
+  hotSfTotalGrams=hotSfGrams;
+  const kohPure=$("koh90").checked?0.9:1.0;
+
+  // 1) щёлочь на омыление (NaOH-эквивалент, с пережиром)
+  let sapNaoh=0;
+  recipe.forEach((r,i)=>{sapNaoh+=grams[i]*OILS[r.idx].sap});
+  sapNaoh*=(1-sf);
+
+  // 2) щёлочь на нейтрализацию кислот (% от масел, БЕЗ пережира)
+  let acidNaoh=0;
+  acids.forEach(a=>{
+    const gAcid = total * a.val / 100;
+    acidNaoh += gAcid * ACIDS[a.idx].naoh;
+  });
+
+  function toLye(naohEq){
+    let na=0,ko=0;
+    if(lyeType==="naoh") na=naohEq;
+    else if(lyeType==="koh") ko=naohEq*KOH_FACTOR/kohPure;
+    else{
+      const p=(parseFloat($("naohPct").value)||0)/100;
+      na=naohEq*p; ko=naohEq*(1-p)*KOH_FACTOR/kohPure;
+    }
+    return {na,ko};
+  }
+  const sap=toLye(sapNaoh), acid=toLye(acidNaoh);
+  const naohG=sap.na+acid.na, kohG=sap.ko+acid.ko, lyeTotal=naohG+kohG;
+
+  // 3) вода
+  const wm=$("waterMode").value, wv=parseFloat($("waterValue").value)||0;
+  if(!Number.isFinite(wv)||wv<=0||(wm==="conc"&&wv>=100)){showWarn("Укажите положительное количество воды; концентрация должна быть меньше 100 %.");return;}
+  let water=0;
+  if(wm==="pct") water=total*wv/100;
+  if(wm==="conc") water=wv>0?lyeTotal*(100-wv)/wv:0;
+  if(wm==="ratio") water=lyeTotal*wv;
+  if(method==="hot") water*=1.10; // компенсация выпаривания при HP
+
+  // вычет жидкости из добавок (пюре, мёд, сорбитол 70%)
+  let waterFromAdds=0;
+  adds.forEach(a=>{
+    const gAdd = total * a.val / 100;
+    waterFromAdds += gAdd * (ADDITIVES[a.idx].water||0);
+  });
+  waterFromAdds=Math.min(waterFromAdds,water*0.9);
+  const waterPour=water-waterFromAdds;
+
+  const fragPct=(parseFloat($("fragrance").value)||0)/100;
+  const frag=fragPct*total;
+
+  const addTotalPct = adds.reduce((s,a)=>s+a.val,0) + customAdds.reduce((s,a)=>s+a.val,0);
+  const addTotal = total * addTotalPct / 100;
+
+  const acidTotalPct = acids.reduce((s,a)=>s+a.val,0);
+  const acidTotal = total * acidTotalPct / 100;
+
+  const batch=total+lyeTotal+waterPour+frag+acidTotal+addTotal+hotSfGrams;
+
+  // 4) свойства
+  const fa={lau:0,myr:0,pal:0,ste:0,ric:0,ole:0,lin:0,lnn:0,eru:0};
+  let iod=0,ins=0;
+  recipe.forEach((r,i)=>{
+    const w=grams[i]/total,o=OILS[r.idx];
+    FA_NAMES.forEach(p=>fa[p[0]]+=o[p[0]]*w);
+    iod+=o.iod*w; ins+=o.ins*w;
+  });
+  const q={hard:fa.lau+fa.myr+fa.pal+fa.ste, clean:fa.lau+fa.myr,
+    cond:fa.ole+fa.lin+fa.lnn+fa.ric, bub:fa.lau+fa.myr+fa.ric,
+    cre:fa.pal+fa.ste+fa.ric, iod:iod, ins:ins};
+
+  // Сохраняем название отдушки
+  saveFragranceName();
+  const fragranceName = $("fragranceName").value.trim();
+  const soapName = $("soapName").value.trim();
+  const comments = $("recipeComments").value.trim();
+
+  // ===== вывод =====
+  const typeName=(lyeType==="naoh"?"NaOH — твёрдое":lyeType==="koh"?"KOH — жидкое":"смесь NaOH "+$("naohPct").value+" % / KOH "+$("kohPct").value+" %")+
+    " · "+(method==="cold"?"холодный способ":"горячий способ");
+  $("resTitle").textContent=(soapName?"«"+soapName+"» · ":" · ")+typeName;
+  let boxes="";
+  if(naohG>0) boxes+='<div class="res-box lye"><div class="v">'+fmt(naohG)+' г</div><div class="l">NaOH итого'+(acid.na>0?" (омыл. "+fmt(sap.na)+" + кисл. "+fmt(acid.na)+")":"")+'</div></div>';
+  if(kohG>0) boxes+='<div class="res-box lye"><div class="v">'+fmt(kohG)+' г</div><div class="l">KOH итого'+($("koh90").checked?" 90 % (х.ч./ч.д.а.)":"")+(acid.ko>0?" (омыл. "+fmt(sap.ko)+" + кисл. "+fmt(acid.ko)+")":"")+'</div></div>';
+  $("resBig").innerHTML=boxes+
+    '<div class="res-box"><div class="v">'+fmt(waterPour)+' г</div><div class="l">Вода для раствора'+(waterFromAdds>0?" (−"+fmt(waterFromAdds)+" из добавок)":"")+(method==="hot"?" · HP +10 %":"")+'</div></div>'+
+    '<div class="res-box"><div class="v">'+fmt(total,0)+' г</div><div class="l">Масла</div></div>'+
+    (frag>0?'<div class="res-box"><div class="v">'+fmt(frag)+' г</div><div class="l">Отдушка'+(fragranceName?" · "+fragranceName:"")+'</div></div>':'')+
+    '<div class="res-box"><div class="v">'+fmt(batch,0)+' г</div><div class="l">Вес партии</div></div>'+
+    '<div class="res-box"><div class="v">'+fmt(sf*100,1)+' % ('+fmt(total*sf,0)+' г)</div><div class="l">Основной пережир (г — условный эквивалент)'+(method==="hot"&&hotSfGrams>0?' · доп. '+fmt(hotSfGrams,0)+' г':'')+'</div></div>';
+
+  $("resTable").innerHTML='<tr><th>Масло</th><th class="num">%</th><th class="num">Граммы</th></tr>'+
+    recipe.map((r,i)=>'<tr><td>'+OILS[r.idx].n+'</td><td class="num">'+fmt(grams[i]/total*100)+'</td><td class="num">'+fmt(grams[i])+'</td></tr>').join("")+
+    '<tr><td><b>Итого</b></td><td class="num"><b>100</b></td><td class="num"><b>'+fmt(total,0)+'</b></td></tr>';
+
+  let extra="";
+  if(acids.length&&acidTotal>0){
+    extra+='<h2 style="margin-top:14px;font-size:15px;color:var(--teal-d)">⚗️ Кислоты</h2><table><tr><th>Кислота</th><th class="num">%</th><th class="num">г</th><th>Этап</th></tr>'+
+      acids.filter(a=>a.val>0).map(a=>{const g=total*a.val/100;return '<tr><td>'+ACIDS[a.idx].n+'</td><td class="num">'+fmt(a.val,1)+'</td><td class="num">'+fmt(g)+'</td><td style="font-size:12px">'+"в воду до щёлочи"+'</td></tr>'}).join("")+'</table>';
+  }
+  if((adds.length||customAdds.length||hotSfG.length||hotSfCustomG.length)&&addTotal+hotSfGrams>0){
+    extra+='<h2 style="margin-top:14px;font-size:15px;color:var(--teal-d)">🌿 Добавки и дополнительные масла</h2><table><tr><th>Компонент</th><th class="num">%</th><th class="num">г</th><th>Этап</th></tr>'+ 
+      adds.filter(a=>a.val>0).map(a=>{const g=total*a.val/100;return '<tr><td>'+ADDITIVES[a.idx].n+'</td><td class="num">'+fmt(a.val,1)+'</td><td class="num">'+fmt(g)+'</td><td style="font-size:12px">'+ADDITIVES[a.idx].stage+'</td></tr>'}).join("")+ 
+      customAdds.filter(a=>a.val>0).map(a=>{const g=total*a.val/100;return '<tr><td>'+a.name+' (своя добавка)</td><td class="num">'+fmt(a.val,1)+'</td><td class="num">'+fmt(g)+'</td><td style="font-size:12px">—</td></tr>'}).join("")+ 
+      hotSfG.map(a=>'<tr><td>'+a.n+' (доп. пережир)</td><td class="num">'+fmt(a.pct,1)+'</td><td class="num">'+fmt(a.g)+'</td><td style="font-size:12px">после варки</td></tr>').join("")+ 
+      hotSfCustomG.map(a=>'<tr><td>'+a.n+' (своё масло, доп. пережир)</td><td class="num">'+fmt(a.pct,1)+'</td><td class="num">'+fmt(a.g)+'</td><td style="font-size:12px">после варки</td></tr>').join("")+ '</table>';
+  }
+  if(comments){
+    extra+='<h2 style="margin-top:14px;font-size:15px;color:var(--teal-d)">📝 Комментарии</h2><p style="font-size:14px;line-height:1.6;white-space:pre-wrap">'+comments+'</p>';
+  }
+  $("extraTables").innerHTML=extra;
+
+  $("qualList").innerHTML=QUALITIES.map(def=>{
+    const v=q[def.key], inR=v>=def.lo&&v<=def.hi, pos=Math.min(100,Math.max(0,v/def.max*100));
+    return '<div class="qrow"><div class="qhead"><span>'+def.name+' <span class="badge '+(inR?'ok':'out')+'">'+(inR?'в норме':'вне диапазона')+'</span></span><span class="val">'+fmt(v,0)+'</span></div>'+
+      '<div class="bar"><div class="range" style="left:'+(def.lo/def.max*100)+'%;width:'+((def.hi-def.lo)/def.max*100)+'%"></div><div class="fill" style="left:calc('+pos+'% - 2px)"></div></div>'+
+      '<div class="qnote">рекомендуется '+def.lo+'–'+def.hi+'</div></div>';
+  }).join("");
+  $("faTable").innerHTML='<tr><th>Жирная кислота</th><th class="num">%</th></tr>'+
+    FA_NAMES.map(p=>'<tr><td>'+p[1]+'</td><td class="num">'+fmt(fa[p[0]])+'</td></tr>').join("");
+
+  ["resultCard","qualCard","faCard"].forEach(id=>$(id).classList.remove("hidden"));
+  if($("resultCard").scrollIntoView)$("resultCard").scrollIntoView({behavior:"smooth",block:"start"});
+
+  lastCalc={typeName,grams,total,naohG,kohG,sapNa:sap.na,sapKo:sap.ko,acidNa:acid.na,acidKo:acid.ko,
+    waterPour,waterFromAdds,frag,fragranceName,soapName,batch,sf,hotSfGrams,hotSf:hotSfG,hotSfCustom:hotSfCustomG,q,fa,method,comments,
+    oils:recipe.map((r,i)=>({n:OILS[r.idx].n,pct:grams[i]/total*100,g:grams[i]})),
+    acids:acids.filter(a=>a.val>0).map(a=>({n:ACIDS[a.idx].n,pct:a.val,g:total*a.val/100})),
+    adds:adds.filter(a=>a.val>0).map(a=>({n:ADDITIVES[a.idx].n,pct:a.val,g:total*a.val/100,stage:ADDITIVES[a.idx].stage})),
+    customAdds:customAdds.filter(a=>a.val>0).map(a=>({n:a.name,pct:a.val,g:total*a.val/100}))};
+}
+
+function resetAll(){
+  recipe=[];acids=[];adds=[];customAdds=[];hotSf=[];hotSfCustom=[];hotSfTotalGrams=0;lastCalc=null;
+  renderOils();renderAcids();renderAdds();renderHotSf();
+  $("fragranceName").value="";$("soapName").value="";$("recipeComments").value="";
+  ["resultCard","qualCard","faCard"].forEach(id=>$(id).classList.add("hidden"));
+}
+
+// ===== СОХРАНЕНИЕ =====
+function getSaved(){try{return JSON.parse(LS.get(STORE_KEY))||[]}catch(e){return[]}}
+function persist(l){LS.set(STORE_KEY,JSON.stringify(l))}
+function saveRecipe(){
+  const name=$("recipeName").value.trim();
+  if(!name){alert("Введите название рецепта");return}
+  if(!recipe.length){alert("Рецепт пуст — добавьте масла");return}
+  const list=getSaved();
+  const data={name,date:new Date().toLocaleDateString("ru-RU"),lyeType,method,
+    naohPct:$("naohPct").value,koh90:$("koh90").checked,
+    unitMode:$("unitMode").value,totalWeight:$("totalWeight").value,
+    waterMode:$("waterMode").value,waterValue:$("waterValue").value,
+    superfat:$("superfat").value,fragrance:$("fragrance").value,
+    soapName:$("soapName").value,
+    hotSf:hotSf.map(o=>({name:OILS[o.idx].n,val:o.pct})),
+    hotSfCustom:hotSfCustom.map(o=>({name:o.name,val:o.pct})),
+    fragranceName:$("fragranceName").value,comments:$("recipeComments").value,
+    oils:recipe.map(r=>({name:OILS[r.idx].n,val:r.val})),
+    acids:acids.map(a=>({name:ACIDS[a.idx].n,val:a.val})),
+    adds:adds.map(a=>({name:ADDITIVES[a.idx].n,val:a.val})),
+    customAdds:customAdds.map(a=>({name:a.name,val:a.val}))};
+  const ex=list.findIndex(r=>r.name===name);
+  if(ex>=0){if(!confirm("Рецепт «"+name+"» уже есть. Перезаписать?"))return;list[ex]=data}
+  else list.push(data);
+  persist(list);$("recipeName").value="";renderSaved();
+}
+function loadRecipe(i){
+  const d=getSaved()[i]; if(!d)return;
+  setLye(d.lyeType); setMethod(d.method||"cold");
+  $("naohPct").value=d.naohPct||60;syncMix();
+  $("koh90").checked=d.koh90!==false;
+  $("unitMode").value=d.unitMode;$("totalWeight").value=d.totalWeight;
+  $("waterMode").value=d.waterMode;switchWater();$("waterValue").value=d.waterValue;
+  $("superfat").value=d.superfat;$("fragrance").value=d.fragrance;
+  $("soapName").value=d.soapName||d.name||"";
+  hotSf=(d.hotSf||[]).map(o=>{const idx=OILS.findIndex(x=>x.n===o.name);return idx>=0?{idx,pct:o.val}:null}).filter(Boolean);
+  hotSfCustom=(d.hotSfCustom||[]).map(o=>({name:o.name,pct:o.val}));
+  renderHotSf();
+  $("fragranceName").value=d.fragranceName||"";
+  $("recipeComments").value=d.comments||"";
+  recipe=(d.oils||[]).map(o=>{const idx=OILS.findIndex(x=>x.n===o.name);return idx>=0?{idx,val:o.val}:null}).filter(Boolean);
+  acids=(d.acids||[]).map(o=>{const idx=ACIDS.findIndex(x=>x.n===o.name);return idx>=0?{idx,val:o.val}:null}).filter(Boolean);
+  adds=(d.adds||[]).map(o=>{const idx=ADDITIVES.findIndex(x=>x.n===o.name);return idx>=0?{idx,val:o.val}:null}).filter(Boolean);
+  customAdds=(d.customAdds||[]).map(a=>({name:a.name,val:a.val}));
+  renderOils();renderAcids();renderAdds();calculate();
+}
+function removeRecipe(i){
+  const list=getSaved();
+  if(!confirm("Удалить рецепт «"+list[i].name+"»?"))return;
+  list.splice(i,1);persist(list);renderSaved();
+}
+function renderSaved(){
+  const list=getSaved();
+  $("savedList").innerHTML=list.length?list.map((r,i)=>
+    '<div class="saved-item"><span class="nm">'+r.name+'<br><span class="dt">'+r.date+' · масел: '+(r.oils||[]).length+'</span></span>'+
+    '<button class="load" onclick="loadRecipe('+i+')">Открыть</button>'+
+    '<button class="rm" onclick="removeRecipe('+i+')">✕</button></div>').join("")
+   :'<div style="font-size:13px;color:var(--mut)">Сохранённых рецептов пока нет. Хранятся в памяти устройства, работают офлайн.</div>';
+}
+</script>
+<script>
+// ===== ОФЛАЙН PDF-ГЕНЕРАТОР (без библиотек и интернета) =====
+function buildRecipeCanvases(){
+  const W=1240, H=1754, M=70; // A4 ~150 dpi
+  const pages=[]; let c,x,y;
+  function newPage(){
+    c=document.createElement("canvas"); c.width=W; c.height=H;
+    x=c.getContext("2d");
+    x.fillStyle="#ffffff"; x.fillRect(0,0,W,H);
+    const gr=x.createLinearGradient(0,0,W,0);
+    gr.addColorStop(0,"#115e59"); gr.addColorStop(1,"#14b8a6");
+    x.fillStyle=gr; x.fillRect(0,0,W,150);
+    x.fillStyle="#ffffff"; x.font="bold 44px Arial"; x.fillText("RECEPTURA academy",M,88);
+    x.font="22px Arial"; x.fillText("Профессиональный калькулятор мыловара · версия 3.2",M,122);
+    y=210; pages.push(c);
+  }
+  function ensure(h){ if(y+h>H-100) newPage(); }
+  function title(t){ ensure(70); x.fillStyle="#115e59"; x.font="bold 34px Arial"; x.fillText(t,M,y); y+=16;
+    x.strokeStyle="#99f6e4"; x.lineWidth=3; x.beginPath(); x.moveTo(M,y); x.lineTo(W-M,y); x.stroke(); y+=30; }
+  function line(t,bold,indent){ ensure(40); x.fillStyle="#1e293b"; x.font=(bold?"bold ":"")+"22px Arial";
+    x.fillText(t,M+(indent||0),y); y+=30; }
+  function twoCol(a,b,bold){ ensure(40); x.fillStyle="#1e293b"; x.font=(bold?"bold ":"")+"22px Arial";
+    x.fillText(a,M,y); const w=x.measureText(b).width; x.fillText(b,W-M-w,y); y+=30; }
+  function small(t){ ensure(32); x.fillStyle="#64748b"; x.font="18px Arial"; x.fillText(t,M,y); y+=32; }
+  const d=lastCalc, f1=(v,dd)=>fmt(v,dd===undefined?1:dd);
+  newPage();
+  x.fillStyle="#334155"; x.font="22px Arial";
+  if(d.soapName){ x.fillStyle="#115e59"; x.font="bold 36px Arial"; x.fillText(d.soapName,M,y); y+=58; }
+  x.fillStyle="#334155"; x.font="26px Arial";
+  x.fillText("Дата: "+new Date().toLocaleDateString("ru-RU")+"   ·   "+d.typeName, M, y); y+=56;
+
+  title("Щёлочь и жидкость");
+  if(d.naohG>0){ twoCol("NaOH (х.ч./ч.д.а.) — итого", f1(d.naohG)+" г", true);
+    if(d.acidNa>0){ small("   на омыление: "+f1(d.sapNa)+" г  +  на нейтрализацию кислот: "+f1(d.acidNa)+" г"); } }
+  if(d.kohG>0){ twoCol("KOH (х.ч./ч.д.а. 90 %) — итого", f1(d.kohG)+" г", true);
+    if(d.acidKo>0){ small("   на омыление: "+f1(d.sapKo)+" г  +  на нейтрализацию кислот: "+f1(d.acidKo)+" г"); } }
+  twoCol("Вода для щелочного раствора", f1(d.waterPour)+" г", true);
+  if(d.waterFromAdds>0) small("   жидкость из добавок (пюре/мёд/сорбитол): ещё "+f1(d.waterFromAdds)+" г — учтена");
+  if(d.method==="hot") small("   горячий способ: вода увеличена на 10 % на выпаривание");
+  twoCol("Пережир (superfat)", f1(d.sf*100)+" %");
+  if(d.frag>0) twoCol((d.fragranceName?"Отдушка ("+d.fragranceName+")":"Отдушка / эфирные масла"), f1(d.frag)+" г");
+  twoCol("Вес партии (итого)", f1(d.batch,0)+" г", true);
+  y+=20;
+
+  title("Масла — "+f1(d.total,0)+" г");
+  d.oils.forEach(o=>twoCol(o.n+"  ("+f1(o.pct)+" %)", f1(o.g)+" г"));
+  y+=20;
+
+  if(d.acids&&d.acids.length){ title("Кислоты");
+    d.acids.forEach(a=>{ twoCol(a.n, f1(a.pct,1)+" % = "+f1(a.g)+" г"); });
+    small("Ввод: растворить в воде ДО добавления щёлочи.");
+    y+=20; }
+  if((d.adds&&d.adds.length)||(d.customAdds&&d.customAdds.length)){ title("Добавки");
+    if(d.adds)d.adds.forEach(a=>{ twoCol(a.n, f1(a.pct,1)+" % = "+f1(a.g)+" г"); small("   "+a.stage); });
+    if(d.customAdds)d.customAdds.forEach(a=>{ twoCol(a.n+" (своя)", f1(a.pct,1)+" % = "+f1(a.g)+" г"); });
+    y+=20; }
+
+  if(d.comments){ title("Комментарии");
+    const lines=d.comments.split("\n");
+    lines.forEach(ln=>{ ensure(32); x.fillStyle="#334155"; x.font="24px Arial"; x.fillText(ln.slice(0,80),M,y); y+=32; });
+    y+=20; }
+
+  if(d.method==="hot" && ((d.hotSf&&d.hotSf.length)||(d.hotSfCustom&&d.hotSfCustom.length))){
+    title("Дополнительный пережир после варки");
+    twoCol("Основной SF (условный эквивалент, не навеска)", f1(d.sf*100)+" % ≈ "+f1(d.total*d.sf)+" г");
+    (d.hotSf||[]).forEach(o=>twoCol(o.n, f1(o.pct)+" % = "+f1(o.g)+" г"));
+    (d.hotSfCustom||[]).forEach(o=>twoCol(o.n+" (своё масло)", f1(o.pct)+" % = "+f1(o.g)+" г"));
+    small("Ввод: после завершения омыления. Дополнительные масла не уменьшают рассчитанную щёлочь.");
+    y+=20;
+  }
+
+  title("Свойства мыла и жирные кислоты");
+  ensure(260);
+  const qStart=y, qMid=M+430; x.font="20px Arial";
+  QUALITIES.forEach((def,i)=>{const v=d.q[def.key],inR=v>=def.lo&&v<=def.hi; x.fillStyle="#1e293b";x.fillText(def.name+": "+f1(v,0)+(inR?" ✓":" !"),M,y);y+=29;});
+  y=qStart; FA_NAMES.forEach((p,i)=>{x.fillStyle="#1e293b";x.fillText(p[1]+": "+f1(d.fa[p[0]])+" %",qMid,y);y+=29;});
+  y=qStart+Math.max(QUALITIES.length,FA_NAMES.length)*29+20;
+  y+=30;
+  ensure(80);
+  x.fillStyle="#92400e"; x.font="bold 24px Arial";
+  x.fillText("Безопасность: всегда добавляйте щёлочь в воду, а не наоборот!",M,y); y+=34;
+  x.fillText("Перчатки, очки, проветриваемое помещение обязательны.",M,y);
+  return pages;
+}
+
+function canvasesToPdf(pages){
+  const enc=[]; let objN=0; const offsets=[];
+  function bytes(s){ const a=new Uint8Array(s.length); for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i)&0xff; return a; }
+  const chunks=[]; let pos=0;
+  function push(u8){ chunks.push(u8); pos+=u8.length; }
+  function pushStr(s){ push(bytes(s)); }
+  function obj(body){ objN++; offsets[objN]=pos; pushStr(objN+" 0 obj\n"+body+"\nendobj\n"); return objN; }
+  pushStr("%PDF-1.4\n%\xE2\xE3\xCF\xD3\n");
+  const imgIds=[], contIds=[];
+  const jpegs=pages.map(c=>{
+    const dataUrl=c.toDataURL("image/jpeg",0.92);
+    const b64=dataUrl.split(",")[1]; const bin=atob(b64);
+    return {bin, w:c.width, h:c.height};
+  });
+  jpegs.forEach((j,i)=>{
+    objN++; offsets[objN]=pos;
+    pushStr(objN+" 0 obj\n<< /Type /XObject /Subtype /Image /Width "+j.w+" /Height "+j.h+
+      " /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length "+j.bin.length+" >>\nstream\n");
+    push(bytes(j.bin)); pushStr("\nendstream\nendobj\n");
+    imgIds.push(objN);
+    const cs="q 595 0 0 842 0 0 cm /Im"+i+" Do Q";
+    contIds.push(obj("<< /Length "+cs.length+" >>\nstream\n"+cs+"\nendstream"));
+  });
+  const pageIds=[]; const pagesId=objN+jpegs.length+2;
+  jpegs.forEach((j,i)=>{
+    pageIds.push(obj("<< /Type /Page /Parent PAGES 0 R /MediaBox [0 0 595 842] /Resources << /XObject << /Im"+i+" "+imgIds[i]+" 0 R >> >> /Contents "+contIds[i]+" 0 R >>"));
+  });
+  const kidsStr=pageIds.map(id=>id+" 0 R").join(" ");
+  const realPagesId=obj("<< /Type /Pages /Kids ["+kidsStr+"] /Count "+pageIds.length+" >>");
+  const catId=obj("<< /Type /Catalog /Pages "+realPagesId+" 0 R >>");
+  for(let i=0;i<chunks.length;i++){
+    const s=Array.from(chunks[i]).map(b=>String.fromCharCode(b)).join("");
+    if(s.indexOf("PAGES 0 R")>=0){
+      chunks[i]=bytes(s.split("PAGES 0 R").join(realPagesId+" 0 R"));
+    }
+  }
+  return assemblePdf(chunks, catId, objN);
+}
+
+function assemblePdf(chunks, catId, objCount){
+  let total=0; chunks.forEach(c=>total+=c.length);
+  const buf=new Uint8Array(total+20000);
+  let p=0; chunks.forEach(c=>{buf.set(c,p);p+=c.length});
+  const body=buf.subarray(0,p);
+  function findAll(pat){
+    const res=[]; const pb=new TextEncoder().encode(pat);
+    outer: for(let i=0;i<p-pb.length;i++){
+      for(let k=0;k<pb.length;k++){ if(body[i+k]!==pb[k]) continue outer; }
+      res.push(i);
+    }
+    return res;
+  }
+  const offs={};
+  for(let n=1;n<=objCount;n++){
+    const found=findAll("\n"+n+" 0 obj");
+    if(found.length) offs[n]=found[found.length-1]+1;
+    else{ const f2=findAll(n+" 0 obj"); if(f2.length) offs[n]=f2[0]; }
+  }
+  let xref="xref\n0 "+(objCount+1)+"\n0000000000 65535 f \n";
+  for(let n=1;n<=objCount;n++){
+    xref+=String(offs[n]||0).padStart(10,"0")+" 00000 n \n";
+  }
+  const startx=p;
+  const tail=xref+"trailer\n<< /Size "+(objCount+1)+" /Root "+catId+" 0 R >>\nstartxref\n"+startx+"\n%%EOF";
+  const tb=new TextEncoder().encode(tail);
+  buf.set(tb,p); p+=tb.length;
+  return buf.subarray(0,p);
+}
+
+function exportPDF(doPrint){
+  if(!lastCalc){alert("Сначала нажмите «Рассчитать рецепт»");return}
+  try{
+    const pages=buildRecipeCanvases();
+    const pdfBytes=canvasesToPdf(pages);
+    const blob=new Blob([pdfBytes],{type:"application/pdf"});
+    const url=URL.createObjectURL(blob);
+    if(doPrint){
+      const fr=document.createElement("iframe");
+      fr.style.cssText="position:fixed;right:0;bottom:0;width:1px;height:1px;border:0";
+      fr.src=url; document.body.appendChild(fr);
+      fr.onload=()=>{ try{ fr.contentWindow.focus(); fr.contentWindow.print(); }
+        catch(e){ window.open(url,"_blank"); } };
+      setTimeout(()=>{URL.revokeObjectURL(url); fr.remove();}, 60000);
+    } else {
+      const a=document.createElement("a");
+      a.href=url; a.download="RECEPTURA_рецепт_"+new Date().toISOString().slice(0,10)+".pdf";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 10000);
+    }
+  }catch(e){ alert("Ошибка экспорта PDF: "+e.message); }
+}
+
+// ===== ОФЛАЙН: service worker + авто-обновление =====
+if("serviceWorker" in navigator){
+  let reloading=false;
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{
+    if(reloading)return; reloading=true; location.reload();
+  });
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(reg=>{
+      reg.update();
+      setInterval(()=>reg.update(),60*60*1000);
+      reg.addEventListener("updatefound",()=>{
+        const nw=reg.installing; if(!nw)return;
+        nw.addEventListener("statechange",()=>{
+          if(nw.state==="installed"&&navigator.serviceWorker.controller) nw.postMessage("SKIP_WAITING");
+        });
+      });
+    }).catch(()=>{});
+  });
+}
+
+// ===== ВСТРАИВАНИЕ В IFRAME (Tilda и др.): передаём высоту родителю =====
+if(window.parent!==window){
+  document.documentElement.classList.add("embedded");
+  const sendH=()=>{
+    const h=Math.ceil(document.querySelector(".wrap").getBoundingClientRect().bottom+window.scrollY+40);
+    parent.postMessage({receptura:"height",height:h},"*");
+  };
+  window.addEventListener("load",sendH);
+  window.addEventListener("resize",sendH);
+  if(window.ResizeObserver) new ResizeObserver(sendH).observe(document.body);
+  setInterval(sendH,1000);
+}
+
+// ===== СТАРТ =====
+fillSelects(); switchWater(); methodNoteText();
+recipe=[
+ {idx:OILS.findIndex(o=>o.n.indexOf("Оливковое")===0&&o.n.indexOf("нерафинированное")>0),val:40},
+ {idx:OILS.findIndex(o=>o.n.indexOf("Кокосовое")===0),val:25},
+ {idx:OILS.findIndex(o=>o.n.indexOf("Пальмовое масло")===0),val:25},
+ {idx:OILS.findIndex(o=>o.n.indexOf("Касторовое")===0),val:10}
+].filter(r=>r.idx>=0);
+renderOils(); renderAcids(); renderAdds(); renderSaved();
+</script>
+<script>
+// ===== INCI-БАЗА (54 масла) =====
+const INCI_OILS={
+"Абрикосовых косточек масло":"Prunus Armeniaca Kernel Oil","Авокадо масло":"Persea Gratissima Oil",
+"Аргановое масло":"Argania Spinosa Kernel Oil","Бабассу масло":"Orbignya Oleifera Seed Oil",
+"Баобаба масло":"Adansonia Digitata Seed Oil","Бораго (огуречника) масло":"Borago Officinalis Seed Oil",
+"Виноградной косточки масло":"Vitis Vinifera Seed Oil","Вишнёвых косточек масло":"Prunus Cerasus Seed Oil",
+"Горчичное масло":"Brassica Juncea Seed Oil","Грецкого ореха масло":"Juglans Regia Seed Oil",
+"Гхи (масло гхи)":"Butyrum (Ghee)",
+"Жожоба (воск)":"Simmondsia Chinensis Seed Oil","Зародышей пшеницы масло":"Triticum Vulgare Germ Oil",
+"Какао масло (нерафинированное)":"Theobroma Cacao Seed Butter","Какао масло (рафинированное)":"Theobroma Cacao Seed Butter",
+"Касторовое масло":"Ricinus Communis Seed Oil","Кокосовое масло":"Cocos Nucifera Oil",
+"Конопляное масло":"Cannabis Sativa Seed Oil","Кофе (зелёных зёрен) масло":"Coffea Arabica Seed Oil",
+"Кукурузное масло":"Zea Mays Germ Oil","Кунжутное масло":"Sesamum Indicum Seed Oil",
+"Купуасу масло (баттер)":"Theobroma Grandiflorum Seed Butter","Ланолин безводный":"Lanolin",
+"Лесного ореха (фундук)":"Corylus Avellana Seed Oil","Льняное масло":"Linum Usitatissimum Seed Oil",
+"Макадамии масло":"Macadamia Ternifolia Seed Oil","Манго масло (баттер)":"Mangifera Indica Seed Butter",
+"Миндальное масло (сладкий)":"Prunus Amygdalus Dulcis Oil","Моной де Таити":"Cocos Nucifera Oil (Monoi)",
+"Ним (нима) масло":"Azadirachta Indica Seed Oil","Облепиховое масло (мякоть)":"Hippophae Rhamnoides Fruit Oil",
+"Оливковое масло (нерафинированное, высший сорт)":"Olea Europaea Fruit Oil",
+"Оливковое масло (рафинированное)":"Olea Europaea Fruit Oil",
+"Оливковое масло (помас, жмыховое)":"Olea Europaea Pomace Oil",
+"Пальмовое масло":"Elaeis Guineensis Oil","Пальмоядровое масло":"Elaeis Guineensis Kernel Oil",
+"Персиковых косточек масло":"Prunus Persica Kernel Oil","Подсолнечное масло":"Helianthus Annuus Seed Oil",
+"Подсолнечное высокоолеиновое":"Helianthus Annuus Seed Oil","Пчелиный воск":"Cera Alba",
+"Рапсовое масло":"Brassica Napus Seed Oil","Рисовых отрубей масло":"Oryza Sativa Bran Oil",
+"Сало баранье (топлёное)":"Tallow","Сало говяжье (топлёное)":"Tallow","Смалец (свиной жир)":"Lard",
+"Соевое масло":"Glycine Soja Oil","Стеариновая кислота":"Stearic Acid",
+"Топлёное масло (сливочное)":"Butyrum (Clarified Butter)",
+"Тыквенных семечек масло":"Cucurbita Pepo Seed Oil","Фруктоза (для прозрачности)":"Fructose",
+"Хлопковое масло":"Gossypium Herbaceum Seed Oil",
+"Чёрного тмина масло":"Nigella Sativa Seed Oil",
+"Ши (карите) масло (нерафинированное)":"Butyrospermum Parkii Butter",
+"Ши (карите) масло (рафинированное)":"Butyrospermum Parkii Butter",
+"Шиповника семян масло":"Rosa Canina Seed Oil","Энотеры (примулы) масло":"Oenothera Biennis Oil",
+"Яичного желтка масло":"Egg Oil"};
+const SAPONATE={
+"Оливковое масло (нерафинированное, высший сорт)":"Olivate","Оливковое масло (рафинированное)":"Olivate",
+"Оливковое масло (помас, жмыховое)":"Olivate","Кокосовое масло":"Cocoate","Пальмовое масло":"Palmate",
+"Пальмоядровое масло":"Palm Kernelate","Касторовое масло":"Castorate",
+"Ши (карите) масло (нерафинированное)":"Shea Butterate","Ши (карите) масло (рафинированное)":"Shea Butterate",
+"Какао масло (нерафинированное)":"Cocoa Butterate","Какао масло (рафинированное)":"Cocoa Butterate",
+"Сало говяжье (топлёное)":"Tallowate","Сало баранье (топлёное)":"Tallowate","Смалец (свиной жир)":"Lardate",
+"Подсолнечное масло":"Sunflowerseedate","Подсолнечное высокоолеиновое":"Sunflowerseedate",
+"Миндальное масло (сладкий)":"Sweet Almondate","Авокадо масло":"Avocadoate",
+"Рисовых отрубей масло":"Rice Branate","Соевое масло":"Soyate","Рапсовое масло":"Canolate",
+"Конопляное масло":"Hempseedate","Бабассу масло":"Babassuate","Макадамии масло":"Macadamia Seedate",
+"Абрикосовых косточек масло":"Apricot Kernelate","Виноградной косточки масло":"Grapeseedate",
+"Манго масло (баттер)":"Mango Butterate","Жожоба (воск)":"Jojobate","Стеариновая кислота":"Stearate",
+"Пчелиный воск":"Beeswaxate","Горчичное масло":"Mustard Seedate","Хлопковое масло":"Cottonseedate",
+"Гхи (масло гхи)":"Butterate","Топлёное масло (сливочное)":"Butterate"};
+const ACID_INCI={
+"Молочная кислота 80 %":{raw:"Lactic Acid",salt:"Lactate",ruSalt:"лактат"},
+"Лимонная кислота (безводная)":{raw:"Citric Acid",salt:"Citrate",ruSalt:"цитрат"},
+"Лимонная кислота (моногидрат)":{raw:"Citric Acid",salt:"Citrate",ruSalt:"цитрат"},
+"Янтарная кислота":{raw:"Succinic Acid",salt:"Succinate",ruSalt:"сукцинат"},
+"Фитиновая кислота (50 % р-р)":{raw:"Phytic Acid",salt:"Phytate",ruSalt:"фитат"},
+"Яблочная кислота":{raw:"Malic Acid",salt:"Malate",ruSalt:"малат"},
+"Глюконолактон (GDL)":{raw:"Gluconolactone",salt:"Gluconate",ruSalt:"глюконат"},
+"Глицин (аминоуксусная кислота)":{raw:"Glycine",salt:"Glycinate",ruSalt:"глицинат"}};
+const ADD_INCI={
+"Глина белая (каолин)":"Kaolin",
+"Грязь Мёртвого моря":"Maris Limus (Dead Sea Mud)",
+"Грязь чёрная (сульфидная, иловая)":"Silt",
+"Грязь сакская (Крым)":"Silt",
+"Грязь тамбуканская":"Silt",
+"Грязь вулканическая (пепел)":"Volcanic Ash",
+"Грязь торфяная (пелоид)":"Peat",
+"Рапа/бишофит (солевой концентрат)":"Maris Sal","Глина розовая":"Illite","Глина зелёная":"Illite",
+"Глина голубая (кембрийская)":"Montmorillonite","Глина красная":"Illite",
+"Глина чёрная (вулканическая)":"Montmorillonite","Глина жёлтая":"Illite","Глицин":"Glycine",
+"Сорбитол 70 % (жидкий)":"Sorbitol","Сорбит сухой":"Sorbitol","Ментол (кристаллы)":"Menthol",
+"Молотая овсянка":"Avena Sativa Kernel Meal","Травы сушёные (календула, ромашка…)":"Calendula Officinalis / Chamomilla Recutita Flower",
+"Куркума (краситель)":"Curcuma Longa Root Powder","Паприка (краситель)":"Capsicum Annuum Fruit Powder",
+"Корица молотая":"Cinnamomum Cassia Bark Powder","Какао-порошок (краситель)":"Theobroma Cacao Seed Powder",
+"Уголь бамбуковый":"Charcoal Powder","Уголь активированный":"Charcoal Powder",
+"Горчичный порошок":"Sinapis Alba Seed Powder",
+"Дёготь берёзовый":"Betula Alba Tar","Пюре овощное (тыква, морковь…)":"Vegetable Puree",
+"Пюре фруктовое (банан, яблоко…)":"Fruit Puree","Пюре огурца":"Cucumis Sativus Fruit Puree",
+"Пюре авокадо":"Persea Gratissima Fruit Puree","Сера (медицинская)":"Sulfur","Сода пищевая":"Sodium Bicarbonate",
+"Фруктоза":"Fructose","Мёд":"Mel","Молоко сухое":"Lac Powder","Шёлк (волокна/пептиды)":"Sericin",
+"Соль морская":"Sodium Chloride","Сахар":"Sucrose","Диоксид титана":"Titanium Dioxide (CI 77891)",
+"Оксиды-пигменты (мика и др.)":"Mica, Iron Oxides","Кофе молотый":"Coffea Arabica Seed Powder",
+"Мак (семена)":"Papaver Somniferum Seed","Люфа молотая":"Luffa Cylindrica Fruit Powder",
+"Лактат натрия 60 % (раствор)":"Sodium Lactate","Цитрат натрия (порошок)":"Sodium Citrate",
+"Цедра цитрусовых (молотая)":"Citrus Peel Powder"};
+
+// ===== ЭТИКЕТКА =====
+let inciMode="raw";
+function setInciMode(v,btn){inciMode=v;document.querySelectorAll("#inciSeg button").forEach(b=>b.classList.remove("on"));btn.classList.add("on");renderInci()}
+function lowRu(s){return s.charAt(0).toLowerCase()+s.slice(1)}
+function renderInci(){
+  if(!lastCalc)return;
+  const d=lastCalc;
+  const saltEn=(d.kohG>0&&d.naohG>0)?"Sodium/Potassium":(d.kohG>0?"Potassium":"Sodium");
+  const saltRu=(d.kohG>0&&d.naohG>0)?"натрия/калия":(d.kohG>0?"калия":"натрия");
+  const items=[];
+  const waterTotal=d.waterPour;
+  if(inciMode==="raw"){
+    items.push({ru:"вода",en:"Aqua",g:waterTotal});
+    d.oils.forEach(o=>items.push({ru:lowRu(o.n),en:INCI_OILS[o.n]||o.n,g:o.g}));
+    if(d.naohG>0)items.push({ru:"гидроксид натрия",en:"Sodium Hydroxide",g:d.naohG});
+    if(d.kohG>0)items.push({ru:"гидроксид калия",en:"Potassium Hydroxide",g:d.kohG});
+    d.acids.forEach(a=>{const m=ACID_INCI[a.n]||{};items.push({ru:lowRu(a.n),en:m.raw||a.n,g:a.g})});
+  }else{
+    d.oils.forEach(o=>{
+      const sp=SAPONATE[o.n];
+      items.push(sp?{ru:"омылённое "+lowRu(o.n),en:saltEn+" "+sp,g:o.g}:{ru:lowRu(o.n),en:INCI_OILS[o.n]||o.n,g:o.g});
+    });
+    items.push({ru:"вода",en:"Aqua",g:waterTotal});
+    items.push({ru:"глицерин (природный, образуется при омылении)",en:"Glycerin",g:d.total*0.08});
+    d.acids.forEach(a=>{const m=ACID_INCI[a.n]||{};items.push({ru:(m.ruSalt||lowRu(a.n))+" "+saltRu,en:saltEn+" "+(m.salt||a.n),g:a.g})});
+  }
+  d.adds.forEach(a=>items.push({ru:lowRu(a.n),en:ADD_INCI[a.n]||a.n,g:a.g}));
+  if(d.customAdds)d.customAdds.forEach(a=>items.push({ru:lowRu(a.n),en:a.n,g:a.g}));
+  if(d.frag>0)items.push({ru:"отдушка"+(d.fragranceName?" ("+d.fragranceName+")":""),en:"Parfum",g:d.frag});
+  [...(d.hotSf||[]),...(d.hotSfCustom||[])].forEach(o=>items.push({ru:lowRu(o.n),en:INCI_OILS[o.n]||o.n,g:o.g}));
+  // слияние позиций с одинаковым INCI (напр. гхи и топлёное -> Sodium Butterate)
+  const merged=[];
+  items.forEach(it=>{
+    const same=merged.find(m=>m.en===it.en);
+    if(same){ same.g+=it.g; if(same.ru!==it.ru) same.ru+=" / "+it.ru; }
+    else merged.push({ru:it.ru,en:it.en,g:it.g});
+  });
+  merged.sort((a,b)=>b.g-a.g);
+  $("inciRu").textContent="Состав: "+merged.map(i=>i.ru).join(", ")+".";
+  $("inciEn").textContent="Ingredients: "+merged.map(i=>i.en).join(", ")+".";
+}
+function copyTxt(id){
+  const t=$(id).textContent;
+  if(!t){alert("Сначала рассчитайте рецепт");return}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>alert("Скопировано"),()=>prompt("Скопируйте вручную:",t))}
+  else prompt("Скопируйте вручную:",t);
+}
+
+// ===== ОПИСАНИЕ МЫЛА ПО СВОЙСТВАМ =====
+function buildDescription(){
+  if(!lastCalc)return;
+  const q=lastCalc.q, fa=lastCalc.fa, s=[];
+  // твёрдость
+  if(q.hard<25)s.push("Брусок получится <b>мягким</b> — дайте ему дольше созреть (6–8 недель) и храните на сухой мыльнице.");
+  else if(q.hard<=54)s.push("Брусок <b>достаточно твёрдый</b>, хорошо держит форму и экономно расходуется.");
+  else s.push("Мыло <b>очень твёрдое</b> — может крошиться при резке; режьте через 12–24 часа после заливки.");
+  // очищение
+  if(q.clean<8)s.push("Очищение <b>очень деликатное</b> — подойдёт для сухой, чувствительной и детской кожи.");
+  else if(q.clean<=22)s.push("Очищение <b>сбалансированное</b> — комфортно для большинства типов кожи.");
+  else s.push("Очищение <b>сильное</b> — отлично мылится, но может подсушивать; рекомендуется для жирной кожи или как хозяйственное.");
+  // кондиционирование
+  if(q.cond>69)s.push("Кондиционирование <b>очень высокое</b>: мыло мягкое и ухаживающее, ощущение крема на коже.");
+  else if(q.cond>=44)s.push("Кондиционирование <b>хорошее</b> — кожа после умывания не стянута.");
+  else s.push("Кондиционирование <b>невысокое</b> — добавьте ухаживающие масла (олива, миндаль, авокадо) или увеличьте пережир.");
+  // пена
+  if(q.bub>=30&&q.cre>=25)s.push("Пена <b>обильная и кремовая</b> одновременно — редкое удачное сочетание.");
+  else if(q.bub>=30)s.push("Пена <b>пышная, с крупными пузырями</b>, быстро взбивается.");
+  else if(q.cre>=30)s.push("Пена <b>кремовая, плотная</b>, как у классического «бабушкиного» мыла.");
+  else if(q.bub<14&&q.cre<16)s.push("Пена <b>скромная</b> — можно добавить касторовое масло (5–10 %) или сахар/мёд для пышности.");
+  else s.push("Пена <b>умеренная</b>, мягкая.");
+  // йодное число
+  if(q.iod>70)s.push("Высокое йодное число (<b>"+q.iod.toFixed(0)+"</b>): много ненасыщенных масел — храните мыло в прохладе, срок хранения меньше обычного (риск прогоркания).");
+  else if(q.iod<41)s.push("Низкое йодное число (<b>"+q.iod.toFixed(0)+"</b>): мыло очень стабильное, долго хранится.");
+  // INS
+  if(q.ins>=136&&q.ins<=165)s.push("INS = <b>"+q.ins.toFixed(0)+"</b> — в идеальном диапазоне: сбалансированный, качественный брусок.");
+  else if(q.ins<136)s.push("INS = <b>"+q.ins.toFixed(0)+"</b> (ниже нормы): брусок мягче эталона — компенсируйте твёрдыми маслами (пальма, какао, ши) или солевой добавкой.");
+  else s.push("INS = <b>"+q.ins.toFixed(0)+"</b> (выше нормы): брусок жёстче эталона — добавьте жидких масел для мягкости.");
+  // особые кислоты
+  if(fa.ric>=7)s.push("Заметная доля рицинолевой кислоты (касторовое масло) — она стабилизирует и уплотняет пену.");
+  if(fa.eru>=5)s.push("В составе есть эруковая кислота ("+fa.eru.toFixed(1)+" %, горчичное масло) — она даёт шелковистость, но в больших дозах замедляет след.");
+  if(fa.lnn>=15)s.push("Много линоленовой кислоты — супер-уход, но следите за сроком годности масел.");
+  $("descText").innerHTML=s.map(t=>"• "+t).join("<br>");
+}
+
+// ===== ЖУРНАЛ ПАРТИЙ =====
+const BATCH_STORE="receptura_batches_v31";
+function getBatches(){try{return JSON.parse(LS.get(BATCH_STORE))||[]}catch(e){return[]}}
+function persistBatches(b){LS.set(BATCH_STORE,JSON.stringify(b))}
+function addBatch(){
+  const name=$("batchName").value.trim(),date=$("batchDate").value,type=$("batchType").value,days=parseInt($("batchDays").value)||42;
+  if(!name){alert("Введите название партии");return}
+  if(!date){alert("Выберите дату варки");return}
+  const b=getBatches();b.unshift({id:Date.now(),name,date,type,days});persistBatches(b);
+  $("batchName").value="";renderBatches();
+}
+function removeBatch(id){if(!confirm("Удалить партию?"))return;persistBatches(getBatches().filter(b=>b.id!==id));renderBatches()}
+function renderBatches(){
+  const bs=getBatches();
+  if(!bs.length){$("batchList").innerHTML='<div style="font-size:13px;color:var(--mut)">Журнал пуст.</div>';return}
+  $("batchList").innerHTML=bs.map(b=>{
+    const s=new Date(b.date),r=new Date(s.getTime()+b.days*864e5),now=new Date();
+    const left=Math.ceil((r-now)/864e5),ready=left<=0;
+    const p=ready?100:Math.max(0,Math.min(100,(b.days-left)/b.days*100));
+    return '<div style="padding:8px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b>'+b.name+'</b>'+
+      '<span style="font-size:12px;color:var(--mut)">'+(b.type==="cold"?"❄️ Холодный":"🔥 Горячий")+'</span>'+
+      '<button onclick="removeBatch('+b.id+')" style="background:#fee2e2;color:var(--bad);padding:4px 8px;font-size:12px;border:none;border-radius:6px;cursor:pointer">✕</button></div>'+
+      '<div style="font-size:12px;color:var(--mut);margin-bottom:6px">Варка: '+s.toLocaleDateString("ru-RU")+' → Готово: '+r.toLocaleDateString("ru-RU")+'</div>'+
+      '<div style="background:#f1f5f9;border-radius:6px;overflow:hidden;height:12px"><div style="height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-l));width:'+p+'%"></div></div>'+
+      '<div style="font-size:11px;color:var(--mut);margin-top:4px;text-align:center">'+(ready?'<b style="color:var(--ok)">✓ Готово!</b>':'Ещё '+left+' дн.')+'</div></div>';
+  }).join("");
+}
+
+// ===== КОНВЕРТЕР ФОРМ =====
+let moldOils=0;
+function moldUI(){
+  const s=$("moldShape").value;
+  $("moldRect").classList.toggle("hidden",s!=="rect");
+  $("moldCyl").classList.toggle("hidden",s!=="cyl");
+  $("moldVol").classList.toggle("hidden",s!=="vol");
+  moldCalcRun();
+}
+function moldCalcRun(){
+  const s=$("moldShape").value,n=Math.max(1,parseInt($("moldCount").value)||1),k=parseFloat($("mCoef").value)||0.7;
+  let vol=0;
+  if(s==="rect")vol=(parseFloat($("mL").value)||0)*(parseFloat($("mW").value)||0)*(parseFloat($("mH").value)||0);
+  if(s==="cyl"){const dd=parseFloat($("mD").value)||0;vol=Math.PI*dd*dd/4*(parseFloat($("mHc").value)||0)}
+  if(s==="vol")vol=parseFloat($("mV").value)||0;
+  vol*=n;moldOils=vol*k;
+  $("moldOut").innerHTML=vol>0?"Объём"+(n>1?" ("+n+" шт)":"")+": <b>"+fmt(vol,0)+" мл</b> → рекомендуемый вес масел: <b>"+fmt(moldOils,0)+" г</b>":"Заполните размеры формы.";
+}
+function applyMold(){
+  if(moldOils<=0){alert("Заполните размеры формы");return}
+  $("totalWeight").value=Math.round(moldOils);
+  $("unitMode").value="percent";renderOils();
+  alert("Общий вес масел установлен: "+Math.round(moldOils)+" г");
+}
+
+// ===== СЕБЕСТОИМОСТЬ =====
+const PRICE_STORE="receptura_prices_v31";
+let prices={};
+function getPrices(){try{return JSON.parse(LS.get(PRICE_STORE))||{}}catch(e){return{}}}
+function persistPrices(p){LS.set(PRICE_STORE,JSON.stringify(p))}
+function saveCostPrices(){
+  document.querySelectorAll("[data-price]").forEach(inp=>{prices[inp.getAttribute("data-price")]=parseFloat(inp.value)||0});
+  persistPrices(prices);
+  if(lastCalc)calculateCost();
+  alert("Цены сохранены");
+}
+function costItems(){
+  const d=lastCalc,items=[];
+  d.oils.forEach(o=>items.push({n:o.n,g:o.g}));
+  [...(d.hotSf||[]),...(d.hotSfCustom||[])].forEach(o=>{const it=items.find(i=>i.n===o.n);if(it)it.g+=o.g;else items.push({n:o.n,g:o.g});});
+  if(d.naohG>0)items.push({n:"NaOH (х.ч./ч.д.а.)",g:d.naohG});
+  if(d.kohG>0)items.push({n:"KOH (х.ч./ч.д.а.)",g:d.kohG});
+  items.push({n:"Вода дистиллированная",g:d.waterPour});
+  d.acids.forEach(a=>items.push({n:a.n,g:a.g}));
+  d.adds.forEach(a=>items.push({n:a.n,g:a.g}));
+  if(d.customAdds)d.customAdds.forEach(a=>items.push({n:a.n,g:a.g}));
+  if(d.frag>0)items.push({n:"Отдушка"+(d.fragranceName?" ("+d.fragranceName+")":""),g:d.frag});
+  return items;
+}
+function renderCostInputs(){
+  if(!lastCalc)return;
+  prices=getPrices();
+  $("costInputs").innerHTML=costItems().map(it=>
+    '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;padding:6px;background:#f8fafc;border-radius:8px">'+
+    '<div style="flex:1;font-size:13px">'+it.n+'</div>'+
+    '<input type="number" data-price="'+it.n+'" value="'+(prices[it.n]||0)+'" min="0" step="0.01" placeholder="₽/кг" style="width:90px;padding:6px;font-size:12px;border:1px solid var(--line);border-radius:6px">'+
+    '<span style="font-size:11px;color:var(--mut)">₽/кг</span></div>').join("");
+}
+function calculateCost(){
+  if(!lastCalc){$("costSum").innerHTML="Сначала рассчитайте рецепт";return}
+  prices=getPrices();
+  let totalCost=0;const rows=[];
+  costItems().forEach(it=>{
+    const c=it.g/1000*(prices[it.n]||0);totalCost+=c;rows.push({n:it.n,g:it.g,c:c});
+  });
+  const kg=lastCalc.batch/1000;
+  $("costSum").innerHTML="<b>Себестоимость партии: "+totalCost.toFixed(2)+" ₽</b>"+(kg>0?" ("+(totalCost/kg).toFixed(0)+" ₽/кг готового мыла)":"");
+  let t='<table><tr><th>Ингредиент</th><th class="num">г</th><th class="num">₽</th><th class="num">%</th></tr>';
+  rows.forEach(r=>{t+='<tr><td>'+r.n+'</td><td class="num">'+fmt(r.g)+'</td><td class="num">'+r.c.toFixed(2)+'</td><td class="num">'+(totalCost>0?(r.c/totalCost*100).toFixed(1):0)+'%</td></tr>'});
+  $("costBreakdown").innerHTML=t+'</table>';
+}
+
+// ===== ХУК: после расчёта показываем всё =====
+const _origCalculate=calculate;
+calculate=function(){
+  _origCalculate();
+  if(!lastCalc)return;
+  ["descCard","costCard","inciCard"].forEach(id=>$(id).classList.remove("hidden"));
+  buildDescription();renderInci();renderCostInputs();calculateCost();
+};
+const _origResetAll=resetAll;
+resetAll=function(){
+  _origResetAll();
+  ["descCard","costCard","inciCard"].forEach(id=>$(id).classList.add("hidden"));
+};
+
+// старт блоков
+$("batchDate").value=new Date().toISOString().slice(0,10);
+renderBatches();moldUI();
+["totalWeight","unitMode"].forEach(id=>$(id).addEventListener("input",updateHotSfInfo));
+$("oilList").addEventListener("input",updateHotSfInfo);
+</script>
+</body>
+</html>
